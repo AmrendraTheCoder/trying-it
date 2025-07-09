@@ -1,0 +1,747 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Project Setup and Development Environment",
+        "description": "Initialize the React Native Expo project with all necessary dependencies and development tools.",
+        "status": "in-progress",
+        "priority": "high",
+        "dependencies": [],
+        "details": "Set up the foundational development environment for the Pixoraa Hub mobile app. This includes creating the Expo project, installing all required dependencies, configuring TypeScript, setting up linting and formatting tools, and establishing the project structure. Configure development tools for efficient coding and debugging.",
+        "testStrategy": "Verify project runs successfully on both iOS and Android simulators/devices using Expo Go. Confirm all development tools (ESLint, Prettier, TypeScript) are working correctly.",
+        "subtasks": [
+          {
+            "id": "1.1",
+            "title": "Initialize Expo Project with TypeScript",
+            "description": "Create new Expo project with TypeScript template and configure basic settings.",
+            "status": "done",
+            "details": "✅ COMPLETED: Successfully created Expo project with TypeScript template using 'npx create-expo-app PixoraaHub --template default'. Configured app.json with proper app name 'Pixoraa Hub', bundle identifiers (com.pixoraa.hub), app description, keywords, and production-ready settings. Project structure created with Expo Router, TypeScript support, and proper configuration for iOS/Android deployment.",
+            "testStrategy": "✅ VERIFIED: Project creates successfully and Expo development server runs correctly. Dependencies installed without conflicts."
+          },
+          {
+            "id": "1.2",
+            "title": "Install and Configure Essential Dependencies",
+            "description": "Install all required packages for navigation, state management, UI, and development tools.",
+            "status": "done",
+            "details": "✅ COMPLETED: Successfully installed all essential dependencies: react-native-paper (UI), zustand (state), @tanstack/react-query (data fetching), react-hook-form (forms), @supabase/supabase-js (backend), expo-secure-store, expo-notifications, expo-camera, expo-image-picker, react-native-vector-icons. Also installed dev dependencies: husky, lint-staged, prettier, @types/react-native-vector-icons. All packages installed without conflicts (0 vulnerabilities). TypeScript compilation check passed successfully.",
+            "testStrategy": "✅ VERIFIED: All packages installed without conflicts, TypeScript compilation passes, no import errors."
+          },
+          {
+            "id": "1.3",
+            "title": "Configure Development Tools and Code Quality",
+            "description": "Set up ESLint, Prettier, Husky, lint-staged, and VSCode configuration.",
+            "status": "done",
+            "details": "✅ COMPLETED: Successfully configured all development tools: 1) Prettier with .prettierrc.js and .prettierignore for consistent formatting, 2) Enhanced ESLint with TypeScript rules and code quality standards, 3) Created .editorconfig for cross-editor consistency, 4) Set up comprehensive VSCode settings with auto-format and linting, 5) Configured Husky git hooks with lint-staged for pre-commit quality checks, 6) Added npm scripts (lint, format, type-check) for development workflow, 7) Formatted all existing code files with Prettier. Git commit successful - all tools working correctly.",
+            "testStrategy": "✅ VERIFIED: ESLint passes with no errors, Prettier formats correctly, TypeScript compiles successfully, git hooks trigger on commit, all development scripts work."
+          },
+          {
+            "id": "1.4",
+            "title": "Establish Project Architecture and Folder Structure",
+            "description": "Create scalable folder structure for components, screens, services, and utilities.",
+            "status": "pending",
+            "details": "Create folders: src/{components/{ui,business}, screens, services, store, utils, types, constants, hooks, assets/{images,icons,fonts}}. Set up index.ts files for clean imports. Configure absolute imports with babel-plugin-module-resolver.",
+            "testStrategy": "Verify folder structure is created and absolute imports work correctly."
+          },
+          {
+            "id": "1.5",
+            "title": "Configure Environment Variables and Constants",
+            "description": "Set up environment configuration for different deployment environments.",
+            "status": "pending",
+            "details": "Create .env files for different environments (development, staging, production). Set up expo-constants for environment variable access. Create constants file for app-wide settings, API endpoints, and configuration values.",
+            "testStrategy": "Verify environment variables are accessible in the app and different environments load correct values."
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Design System and UI Component Library",
+        "description": "Create a comprehensive design system with reusable UI components for consistency and scalability.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [1],
+        "details": "Build a complete design system with theme configuration, typography, color palette, spacing system, and reusable UI components. This ensures consistency across the app and enables rapid development.",
+        "testStrategy": "Create a component showcase screen to verify all components work correctly with different props and states.",
+        "subtasks": [
+          {
+            "id": "2.1",
+            "title": "Design Theme and Color System",
+            "description": "Define color palette, typography scale, spacing system, and theme configuration.",
+            "status": "pending",
+            "details": "Create theme.ts with primary/secondary colors, semantic colors (success, error, warning), typography scales, spacing units, border radius values, and shadow definitions. Support light/dark themes.",
+            "testStrategy": "Verify theme values are accessible throughout the app and theme switching works."
+          },
+          {
+            "id": "2.2",
+            "title": "Core UI Components",
+            "description": "Build fundamental UI components: Button, Input, Card, Modal, Loading states.",
+            "status": "pending",
+            "details": "Create reusable components with proper TypeScript interfaces, variant support, and accessibility features. Include Button (primary, secondary, ghost variants), TextInput with validation states, Card layouts, Modal/BottomSheet, Loading spinners and skeletons.",
+            "testStrategy": "Test all component variants and accessibility features work correctly."
+          },
+          {
+            "id": "2.3",
+            "title": "Layout and Navigation Components",
+            "description": "Create layout components, navigation elements, and screen containers.",
+            "status": "pending",
+            "details": "Build ScreenContainer, HeaderBar, TabBar, SideMenu, FloatingActionButton, Breadcrumbs. Include proper safe area handling, responsive design, and navigation integration.",
+            "testStrategy": "Verify layouts work on different screen sizes and orientations."
+          },
+          {
+            "id": "2.4",
+            "title": "Data Display Components",
+            "description": "Build components for displaying data: Lists, Tables, Charts, Progress indicators.",
+            "status": "pending",
+            "details": "Create FlatList wrappers, DataTable, ProgressBar, Charts (using react-native-chart-kit), Avatar, Badge, StatusIndicator, EmptyState components. Include pagination and infinite scroll support.",
+            "testStrategy": "Test components with various data sets and loading states."
+          },
+          {
+            "id": "2.5",
+            "title": "Form and Input Components",
+            "description": "Build comprehensive form components with validation and accessibility.",
+            "status": "pending",
+            "details": "Create FormField wrapper, Select/Picker, DatePicker, TimePicker, FileUpload, SearchInput, Checkbox, RadioButton, Switch components. Integrate with react-hook-form for validation.",
+            "testStrategy": "Test form validation, accessibility features, and different input types."
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "State Management and Data Layer Architecture",
+        "description": "Implement robust state management with Zustand and React Query for optimal data handling.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [1, 2],
+        "details": "Set up comprehensive state management architecture using Zustand for global state and React Query for server state management. Include proper error handling, caching strategies, and offline support.",
+        "testStrategy": "Test state persistence, data synchronization, and offline functionality.",
+        "subtasks": [
+          {
+            "id": "3.1",
+            "title": "Configure Zustand Global State Management",
+            "description": "Set up Zustand stores for authentication, user preferences, and app state.",
+            "status": "pending",
+            "details": "Create stores for: auth (user, tokens, permissions), app (theme, language, settings), ui (modals, notifications, loading states). Include persistence with zustand/middleware. Add TypeScript interfaces for all store slices.",
+            "testStrategy": "Verify state updates correctly and persists across app restarts."
+          },
+          {
+            "id": "3.2",
+            "title": "Implement React Query for Server State",
+            "description": "Configure React Query with proper caching, background updates, and error handling.",
+            "status": "pending",
+            "details": "Set up QueryClient with optimal defaults, configure cache time, stale time, retry logic. Create custom hooks for queries and mutations. Implement optimistic updates and background refetching.",
+            "testStrategy": "Test data fetching, caching behavior, and offline/online state transitions."
+          },
+          {
+            "id": "3.3",
+            "title": "Create Custom Hooks for Data Operations",
+            "description": "Build reusable hooks for common data operations and business logic.",
+            "status": "pending",
+            "details": "Create hooks: useAuth, useProjects, useTasks, useClients, useTeam, useNotifications. Include loading, error, and success states. Add proper TypeScript generics for reusability.",
+            "testStrategy": "Test hooks in different scenarios and verify proper error handling."
+          },
+          {
+            "id": "3.4",
+            "title": "Implement Offline Support and Synchronization",
+            "description": "Add offline functionality with data synchronization when connection is restored.",
+            "status": "pending",
+            "details": "Use React Query's offline support, implement local storage for critical data, create sync queue for offline actions. Add network status detection and conflict resolution strategies.",
+            "testStrategy": "Test app functionality in offline mode and verify data syncs correctly when online."
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Supabase Backend Infrastructure Setup",
+        "description": "Configure complete Supabase backend with database schema, authentication, and real-time features.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [3],
+        "details": "Set up comprehensive Supabase infrastructure including database schema, Row Level Security policies, authentication configuration, real-time subscriptions, and file storage. Design for multi-tenant architecture.",
+        "testStrategy": "Test all database operations, authentication flows, and real-time features work correctly.",
+        "subtasks": [
+          {
+            "id": "4.1",
+            "title": "Design and Create Database Schema",
+            "description": "Create comprehensive database schema with all required tables and relationships.",
+            "status": "pending",
+            "details": "Create tables: users, teams, projects, tasks, subtasks, clients, services, invoices, expenses, time_entries, messages, files, notifications. Include proper foreign keys, indexes, and constraints. Add audit fields (created_at, updated_at, created_by).",
+            "testStrategy": "Verify all tables are created with proper relationships and constraints."
+          },
+          {
+            "id": "4.2",
+            "title": "Implement Row Level Security Policies",
+            "description": "Configure comprehensive RLS policies for multi-tenant data security.",
+            "status": "pending",
+            "details": "Create RLS policies for each table ensuring users can only access data from their organization. Implement role-based access control (Admin, Manager, Member, Client). Add policies for team member permissions and client portal access.",
+            "testStrategy": "Test data access restrictions work correctly for different user roles."
+          },
+          {
+            "id": "4.3",
+            "title": "Configure Authentication and User Management",
+            "description": "Set up Supabase Auth with email/password, social logins, and user roles.",
+            "status": "pending",
+            "details": "Configure email/password authentication, set up Google/Apple sign-in, create user profiles with role assignment. Implement email verification, password reset, and account recovery flows. Add custom claims for role-based access.",
+            "testStrategy": "Test all authentication flows and verify role-based access works correctly."
+          },
+          {
+            "id": "4.4",
+            "title": "Set Up Real-time Subscriptions",
+            "description": "Configure real-time features for live chat, notifications, and data updates.",
+            "status": "pending",
+            "details": "Set up real-time subscriptions for messages, task updates, project changes, and notifications. Configure presence system for online status. Implement efficient subscription management to prevent memory leaks.",
+            "testStrategy": "Test real-time updates work correctly and subscriptions clean up properly."
+          },
+          {
+            "id": "4.5",
+            "title": "Configure File Storage and CDN",
+            "description": "Set up Supabase Storage for file uploads with proper access control.",
+            "status": "pending",
+            "details": "Configure storage buckets for: profile-images, project-files, invoices, attachments. Set up RLS policies for file access. Configure image transformations and optimize for mobile delivery. Implement file upload progress and error handling.",
+            "testStrategy": "Test file upload, download, and access control work correctly across different file types."
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Authentication and Authorization System",
+        "description": "Implement comprehensive authentication with biometric support and role-based access control.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [4],
+        "details": "Build complete authentication system with multiple login methods, secure token management, biometric authentication, and comprehensive role-based access control throughout the app.",
+        "testStrategy": "Test all authentication methods and verify role-based permissions work correctly.",
+        "subtasks": [
+          {
+            "id": "5.1",
+            "title": "Create Authentication Screens and Forms",
+            "description": "Build login, register, forgot password, and verification screens.",
+            "status": "pending",
+            "details": "Create responsive forms with proper validation, loading states, and error handling. Include password strength indicator, terms acceptance, and email verification flow. Add social login buttons and biometric login option.",
+            "testStrategy": "Test form validation, error handling, and responsive design on different devices."
+          },
+          {
+            "id": "5.2",
+            "title": "Implement Biometric Authentication",
+            "description": "Add Face ID/Touch ID support for secure and convenient login.",
+            "status": "pending",
+            "details": "Use expo-local-authentication for biometric support. Store encrypted credentials securely with expo-secure-store. Implement fallback to password login. Add biometric setup and management in user settings.",
+            "testStrategy": "Test biometric authentication works correctly and fallback mechanisms function properly."
+          },
+          {
+            "id": "5.3",
+            "title": "Build Role-Based Access Control System",
+            "description": "Implement comprehensive RBAC system with permission checking throughout the app.",
+            "status": "pending",
+            "details": "Create permission system for different user roles (Admin, Project Manager, Team Member, Client). Implement permission checking hooks and components. Create role management interface for admins. Add context-based permissions (project access, task editing).",
+            "testStrategy": "Verify users can only access features appropriate to their role and permissions."
+          },
+          {
+            "id": "5.4",
+            "title": "Implement Secure Session Management",
+            "description": "Handle tokens, session refresh, and secure logout across the app.",
+            "status": "pending",
+            "details": "Implement automatic token refresh, secure token storage, session timeout handling. Add logout functionality that clears all stored data. Implement concurrent session management and device-based logout. Add session monitoring and security alerts.",
+            "testStrategy": "Test token refresh works correctly and logout clears all sensitive data."
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Navigation Architecture and Deep Linking",
+        "description": "Implement robust navigation system with Expo Router, deep linking, and role-based navigation.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [5],
+        "details": "Create comprehensive navigation architecture using Expo Router with file-based routing, implement deep linking for all major features, and add role-based navigation restrictions.",
+        "testStrategy": "Test navigation flows, deep linking, and role-based access restrictions work correctly.",
+        "subtasks": [
+          {
+            "id": "6.1",
+            "title": "Configure Expo Router with File-Based Routing",
+            "description": "Set up Expo Router with organized file structure for all app screens.",
+            "status": "pending",
+            "details": "Create app directory structure with (tabs), (auth), and modal routes. Implement layout files for different sections. Configure route parameters and navigation types. Set up proper TypeScript types for routes.",
+            "testStrategy": "Verify all routes work correctly and TypeScript types are properly inferred."
+          },
+          {
+            "id": "6.2",
+            "title": "Implement Bottom Tab Navigation",
+            "description": "Create main bottom tab navigation with adaptive UI for different screen sizes.",
+            "status": "pending",
+            "details": "Build bottom tabs for: Dashboard, Projects, Tasks, Chat, Profile. Add tab icons, badges for notifications, and adaptive behavior for tablet layouts. Implement tab bar customization and role-based tab visibility.",
+            "testStrategy": "Test tab navigation works correctly and adapts properly to different screen sizes."
+          },
+          {
+            "id": "6.3",
+            "title": "Set Up Deep Linking and URL Handling",
+            "description": "Configure deep linking for all major app features and external integrations.",
+            "status": "pending",
+            "details": "Set up deep links for: project details, task details, chat rooms, client profiles, shared files. Configure URL schemes and universal links. Implement link handling with authentication checks and proper error handling.",
+            "testStrategy": "Test deep links work correctly from external sources and handle authentication properly."
+          },
+          {
+            "id": "6.4",
+            "title": "Implement Navigation Guards and Route Protection",
+            "description": "Add authentication and permission-based route protection.",
+            "status": "pending",
+            "details": "Create navigation guards that check authentication status and user permissions. Implement automatic redirects for unauthorized access. Add loading states during permission checks. Create fallback screens for access denied scenarios.",
+            "testStrategy": "Verify route protection works correctly and users are redirected appropriately."
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Testing Infrastructure and Quality Assurance",
+        "description": "Implement comprehensive testing strategy with unit, integration, and E2E tests.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [6],
+        "details": "Set up complete testing infrastructure including unit tests with Jest, component tests with React Native Testing Library, and E2E tests with Detox. Include code coverage reporting and automated testing in CI/CD.",
+        "testStrategy": "Achieve >80% code coverage and ensure all critical user flows are covered by E2E tests.",
+        "subtasks": [
+          {
+            "id": "7.1",
+            "title": "Configure Jest and React Native Testing Library",
+            "description": "Set up unit and component testing infrastructure.",
+            "status": "pending",
+            "details": "Configure Jest with React Native preset, set up testing-library/react-native, configure test utilities and mocks. Create test setup files and custom matchers. Add coverage reporting with lcov.",
+            "testStrategy": "Verify test setup works and can run basic component tests."
+          },
+          {
+            "id": "7.2",
+            "title": "Write Component and Hook Tests",
+            "description": "Create comprehensive tests for UI components and custom hooks.",
+            "status": "pending",
+            "details": "Write tests for all UI components covering different props and states. Test custom hooks with various scenarios. Include accessibility testing and error boundary testing. Aim for >90% component test coverage.",
+            "testStrategy": "Run test suite and verify all components and hooks have adequate test coverage."
+          },
+          {
+            "id": "7.3",
+            "title": "Implement Integration Tests",
+            "description": "Create integration tests for complete user workflows and API interactions.",
+            "status": "pending",
+            "details": "Test complete user flows: login, project creation, task management, team collaboration. Mock Supabase calls and test error scenarios. Include tests for offline functionality and data synchronization.",
+            "testStrategy": "Verify integration tests cover all critical user journeys and edge cases."
+          },
+          {
+            "id": "7.4",
+            "title": "Set Up End-to-End Testing with Detox",
+            "description": "Configure E2E testing for complete app workflows on real devices.",
+            "status": "pending",
+            "details": "Set up Detox for iOS and Android E2E testing. Create tests for critical user paths: onboarding, authentication, core workflows. Include testing on different device sizes and OS versions.",
+            "testStrategy": "Verify E2E tests can run successfully on both platforms and cover main user scenarios."
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Performance Optimization and Monitoring",
+        "description": "Implement performance optimization strategies and monitoring for production-ready performance.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [7],
+        "details": "Optimize app performance with code splitting, image optimization, bundle analysis, and implement comprehensive monitoring for crashes, performance metrics, and user analytics.",
+        "testStrategy": "Achieve smooth 60fps performance and set up monitoring dashboards for production metrics.",
+        "subtasks": [
+          {
+            "id": "8.1",
+            "title": "Implement Code Splitting and Lazy Loading",
+            "description": "Optimize bundle size with code splitting and lazy component loading.",
+            "status": "pending",
+            "details": "Implement React.lazy for screen components, optimize images with expo-image, set up bundle splitting for vendor libraries. Use React.memo and useMemo for performance-critical components.",
+            "testStrategy": "Measure bundle size reduction and verify lazy loading works correctly."
+          },
+          {
+            "id": "8.2",
+            "title": "Set Up Performance Monitoring",
+            "description": "Implement performance monitoring with crash reporting and analytics.",
+            "status": "pending",
+            "details": "Integrate Flipper for development debugging, set up Sentry for crash reporting, implement custom performance metrics. Add FPS monitoring and memory usage tracking. Configure user analytics with privacy compliance.",
+            "testStrategy": "Verify monitoring captures performance issues and provides actionable insights."
+          },
+          {
+            "id": "8.3",
+            "title": "Optimize Images and Assets",
+            "description": "Implement comprehensive asset optimization for faster loading and better performance.",
+            "status": "pending",
+            "details": "Set up automatic image optimization, implement progressive loading for large images, optimize app icons and splash screens. Use WebP format where supported, implement image caching strategies.",
+            "testStrategy": "Measure asset loading performance improvements and verify caching works correctly."
+          },
+          {
+            "id": "8.4",
+            "title": "Implement Offline-First Architecture",
+            "description": "Build robust offline functionality with intelligent data synchronization.",
+            "status": "pending",
+            "details": "Implement offline storage with SQLite, create sync queue for offline actions, add conflict resolution strategies. Implement intelligent background sync and offline UI indicators.",
+            "testStrategy": "Test app functionality in various network conditions and verify data consistency."
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "CI/CD Pipeline and DevOps Setup",
+        "description": "Set up automated build, test, and deployment pipeline with proper staging environments.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [8],
+        "details": "Configure complete CI/CD pipeline with automated testing, code quality checks, and deployment to app stores. Set up staging and production environments with proper configuration management.",
+        "testStrategy": "Verify automated builds and deployments work correctly for both platforms.",
+        "subtasks": [
+          {
+            "id": "9.1",
+            "title": "Configure GitHub Actions for CI/CD",
+            "description": "Set up automated workflows for testing, building, and deployment.",
+            "status": "pending",
+            "details": "Create workflows for: pull request testing, automated builds with EAS, deployment to TestFlight/Play Console. Include code quality checks, security scanning, and dependency auditing.",
+            "testStrategy": "Verify all workflows run correctly and deployments are successful."
+          },
+          {
+            "id": "9.2",
+            "title": "Set Up Environment Management",
+            "description": "Configure staging and production environments with proper secrets management.",
+            "status": "pending",
+            "details": "Set up separate Supabase projects for staging/production, configure environment-specific secrets, implement feature flags for gradual rollouts. Set up monitoring and alerting for production issues.",
+            "testStrategy": "Verify environment isolation and proper configuration deployment."
+          },
+          {
+            "id": "9.3",
+            "title": "Implement Code Quality and Security Checks",
+            "description": "Add automated code quality, security, and dependency vulnerability scanning.",
+            "status": "pending",
+            "details": "Configure SonarCloud for code quality, add security scanning with CodeQL, implement dependency vulnerability checks. Set up pre-commit hooks and pull request quality gates.",
+            "testStrategy": "Verify security scans detect vulnerabilities and code quality metrics are tracked."
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "User Management and Team Administration",
+        "description": "Build comprehensive user and team management with role assignment and organizational features.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [6],
+        "details": "Create complete user management system with team creation, member invitation, role management, and organizational hierarchy. Include user onboarding, profile management, and team collaboration features.",
+        "testStrategy": "Test complete user lifecycle from invitation to active team participation.",
+        "subtasks": [
+          {
+            "id": "10.1",
+            "title": "Build User Profile Management",
+            "description": "Create comprehensive user profile screens with skills, availability, and preferences.",
+            "status": "pending",
+            "details": "Build profile creation/editing forms with photo upload, skills tagging, availability calendar, notification preferences. Include social features like team member directory and contact information.",
+            "testStrategy": "Test profile updates sync correctly and all features work across devices."
+          },
+          {
+            "id": "10.2",
+            "title": "Implement Team Creation and Management",
+            "description": "Build team creation workflow with member invitation and role assignment.",
+            "status": "pending",
+            "details": "Create team setup wizard, implement email invitation system, build role assignment interface. Include team settings, member removal, and role modification features. Add team analytics and activity tracking.",
+            "testStrategy": "Test complete team creation and member management workflows."
+          },
+          {
+            "id": "10.3",
+            "title": "Create Member Directory and Search",
+            "description": "Build searchable team member directory with filtering and contact features.",
+            "status": "pending",
+            "details": "Create team member list with search and filtering by skills, role, availability. Include contact options (chat, email, call), member profiles, and online status indicators.",
+            "testStrategy": "Verify search and filtering work correctly and contact features integrate properly."
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Project Management Core System",
+        "description": "Implement comprehensive project management with templates, workflows, and collaboration features.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [10],
+        "details": "Build complete project management system with project creation, templates, team assignment, milestone tracking, and client collaboration features.",
+        "testStrategy": "Test complete project lifecycle from creation to completion with all stakeholders.",
+        "subtasks": [
+          {
+            "id": "11.1",
+            "title": "Build Project Creation and Templates",
+            "description": "Create project setup wizard with service-specific templates and configuration.",
+            "status": "pending",
+            "details": "Build multi-step project creation with service categorization (AI/Automation, Web Dev, App Dev, Design), template selection, team assignment, timeline setup. Include custom field configuration and project settings.",
+            "testStrategy": "Test project creation with different templates and verify all settings are saved correctly."
+          },
+          {
+            "id": "11.2",
+            "title": "Implement Project Dashboard and Overview",
+            "description": "Create comprehensive project dashboard with progress tracking and key metrics.",
+            "status": "pending",
+            "details": "Build project overview with progress indicators, team member status, recent activity, upcoming milestones. Include project health indicators, budget tracking, and deadline warnings.",
+            "testStrategy": "Verify dashboard accurately reflects project status and updates in real-time."
+          },
+          {
+            "id": "11.3",
+            "title": "Create Project Timeline and Milestones",
+            "description": "Build interactive timeline view with milestone tracking and deadline management.",
+            "status": "pending",
+            "details": "Implement Gantt-style timeline view, milestone creation and tracking, dependency visualization. Include timeline adjustments, progress updates, and deadline notifications.",
+            "testStrategy": "Test timeline accuracy and milestone tracking across different project types."
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Task Management with Kanban System",
+        "description": "Build advanced task management with Kanban boards, drag-and-drop, and collaborative features.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [11],
+        "details": "Implement comprehensive task management system with Kanban boards, task dependencies, time tracking, and real-time collaboration features.",
+        "testStrategy": "Test task management workflows with multiple users and verify real-time updates work correctly.",
+        "subtasks": [
+          {
+            "id": "12.1",
+            "title": "Build Kanban Board Interface",
+            "description": "Create interactive Kanban board with drag-and-drop functionality and customizable columns.",
+            "status": "pending",
+            "details": "Implement drag-and-drop task movement between columns, customizable board layouts, swimlanes, filtering and search. Include board templates and column management.",
+            "testStrategy": "Test drag-and-drop works smoothly and board state persists correctly."
+          },
+          {
+            "id": "12.2",
+            "title": "Implement Task Creation and Management",
+            "description": "Build comprehensive task creation with rich details, attachments, and collaboration features.",
+            "status": "pending",
+            "details": "Create task creation modal with rich text descriptions, file attachments, assignee selection, priority levels, due dates. Include task templates, checklists, and custom fields.",
+            "testStrategy": "Test task creation with various configurations and verify all data is saved correctly."
+          },
+          {
+            "id": "12.3",
+            "title": "Add Task Dependencies and Relationships",
+            "description": "Implement task dependencies, subtasks, and relationship management.",
+            "status": "pending",
+            "details": "Build dependency creation interface, subtask hierarchies, blocking relationships. Include dependency visualization and automatic status updates based on dependencies.",
+            "testStrategy": "Test dependency logic works correctly and prevents circular dependencies."
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "title": "Real-time Communication and Chat System",
+        "description": "Build comprehensive chat system with channels, direct messages, file sharing, and video calls.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [10],
+        "details": "Implement complete communication system with real-time messaging, file sharing, video call integration, and notification management.",
+        "testStrategy": "Test real-time messaging works correctly with multiple users and all features function properly.",
+        "subtasks": [
+          {
+            "id": "13.1",
+            "title": "Build Chat Interface and Message Handling",
+            "description": "Create chat UI with message bubbles, typing indicators, and message status.",
+            "status": "pending",
+            "details": "Build chat interface with message bubbles, emoji support, message reactions, reply/thread functionality. Include typing indicators, read receipts, and message status indicators.",
+            "testStrategy": "Test chat interface updates in real-time and all message features work correctly."
+          },
+          {
+            "id": "13.2",
+            "title": "Implement File Sharing and Media Handling",
+            "description": "Add file upload, image sharing, and media preview functionality to chat.",
+            "status": "pending",
+            "details": "Implement file upload with progress indicators, image/video previews, document sharing. Include file type restrictions, size limits, and secure file access controls.",
+            "testStrategy": "Test file sharing works correctly and file access permissions are enforced."
+          },
+          {
+            "id": "13.3",
+            "title": "Add Push Notifications and Presence",
+            "description": "Implement push notifications for messages and online presence indicators.",
+            "status": "pending",
+            "details": "Set up push notifications for new messages, mentions, project updates. Implement presence system showing online/offline status, last seen indicators, and notification preferences.",
+            "testStrategy": "Test notifications are delivered correctly and presence status updates accurately."
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Client Management and Portal System",
+        "description": "Build comprehensive CRM with client portal, communication tracking, and project visibility.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [11, 13],
+        "details": "Create complete client relationship management system with client portal access, communication logging, and project collaboration features.",
+        "testStrategy": "Test complete client journey from onboarding to project completion and portal access.",
+        "subtasks": [
+          {
+            "id": "14.1",
+            "title": "Build Client Profile and Contact Management",
+            "description": "Create comprehensive client profile system with contact history and preferences.",
+            "status": "pending",
+            "details": "Build client profile creation, contact information management, communication history tracking, preference settings. Include client categorization and relationship mapping.",
+            "testStrategy": "Test client profile management and communication history tracking."
+          },
+          {
+            "id": "14.2",
+            "title": "Implement Client Portal Access",
+            "description": "Create client portal for project visibility and collaboration.",
+            "status": "pending",
+            "details": "Build client portal with project progress visibility, document access, communication with team, feedback submission. Include limited access controls and client-specific views.",
+            "testStrategy": "Verify clients can only access their projects and appropriate features."
+          },
+          {
+            "id": "14.3",
+            "title": "Create Contract and Document Management",
+            "description": "Build document management system for contracts, proposals, and deliverables.",
+            "status": "pending",
+            "details": "Implement document upload/storage, contract templates, e-signature integration, version control. Include document sharing and access control features.",
+            "testStrategy": "Test document management and sharing features work correctly."
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Financial Management and Invoicing",
+        "description": "Build comprehensive financial management with automated invoicing, expense tracking, and reporting.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [14],
+        "details": "Implement complete financial management system with invoice generation, expense tracking, payment monitoring, and financial reporting features.",
+        "testStrategy": "Test complete financial workflow from expense tracking to invoice generation and payment processing.",
+        "subtasks": [
+          {
+            "id": "15.1",
+            "title": "Build Invoice Generation and Management",
+            "description": "Create automated invoice generation with templates and customization options.",
+            "status": "pending",
+            "details": "Build invoice templates, automated generation from time tracking, customizable fields, PDF generation, email sending. Include invoice status tracking and payment reminders.",
+            "testStrategy": "Test invoice generation accuracy and delivery functionality."
+          },
+          {
+            "id": "15.2",
+            "title": "Implement Expense Tracking and Categorization",
+            "description": "Create expense management system with receipt capture and categorization.",
+            "status": "pending",
+            "details": "Build expense entry forms, receipt photo capture and OCR, expense categorization, approval workflows. Include expense reporting and reimbursement tracking.",
+            "testStrategy": "Test expense capture and categorization accuracy."
+          },
+          {
+            "id": "15.3",
+            "title": "Create Financial Reporting and Analytics",
+            "description": "Build comprehensive financial reporting with charts, forecasting, and profitability analysis.",
+            "status": "pending",
+            "details": "Implement revenue/expense reports, profit margin analysis, cash flow forecasting, tax reporting. Include interactive charts and export functionality.",
+            "testStrategy": "Verify financial calculations are accurate and reports provide useful insights."
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "title": "Analytics Dashboard and Business Intelligence",
+        "description": "Create comprehensive analytics dashboard with real-time metrics and business insights.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [12, 15],
+        "details": "Build interactive dashboard with real-time analytics, KPI tracking, and business intelligence features for data-driven decision making.",
+        "testStrategy": "Test dashboard accuracy and performance with large datasets.",
+        "subtasks": [
+          {
+            "id": "16.1",
+            "title": "Build Executive Dashboard with KPIs",
+            "description": "Create high-level dashboard with key business metrics and performance indicators.",
+            "status": "pending",
+            "details": "Build dashboard with revenue metrics, project completion rates, team productivity, client satisfaction scores. Include goal tracking and performance trends.",
+            "testStrategy": "Verify KPI calculations are accurate and update in real-time."
+          },
+          {
+            "id": "16.2",
+            "title": "Implement Project and Team Analytics",
+            "description": "Create detailed analytics for project performance and team productivity.",
+            "status": "pending",
+            "details": "Build project health analytics, team workload distribution, time tracking insights, productivity metrics. Include comparative analysis and trend identification.",
+            "testStrategy": "Test analytics accuracy and verify insights are actionable."
+          },
+          {
+            "id": "16.3",
+            "title": "Add Custom Reports and Data Export",
+            "description": "Build custom report builder with data export capabilities.",
+            "status": "pending",
+            "details": "Implement custom report builder, scheduled reports, data export to CSV/PDF, report sharing. Include date range filtering and custom metrics selection.",
+            "testStrategy": "Test report generation and export functionality across different data sets."
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "title": "Security Hardening and Compliance",
+        "description": "Implement comprehensive security measures and ensure compliance with data protection regulations.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [9],
+        "details": "Implement security best practices, data encryption, audit logging, and compliance features for GDPR/CCPA and other regulations.",
+        "testStrategy": "Conduct security audit and verify compliance requirements are met.",
+        "subtasks": [
+          {
+            "id": "17.1",
+            "title": "Implement Data Encryption and Security",
+            "description": "Add end-to-end encryption for sensitive data and secure communication.",
+            "status": "pending",
+            "details": "Implement encryption for sensitive data at rest and in transit, secure API communication, certificate pinning. Add data masking and secure data deletion features.",
+            "testStrategy": "Verify encryption works correctly and sensitive data is properly protected."
+          },
+          {
+            "id": "17.2",
+            "title": "Add Audit Logging and Monitoring",
+            "description": "Implement comprehensive audit logging for security and compliance tracking.",
+            "status": "pending",
+            "details": "Build audit logging for all user actions, data access, system changes. Include log analysis, security alerts, suspicious activity detection, and compliance reporting.",
+            "testStrategy": "Test audit logs capture all required events and alerts work correctly."
+          },
+          {
+            "id": "17.3",
+            "title": "Ensure GDPR/CCPA Compliance",
+            "description": "Implement data protection features and privacy compliance measures.",
+            "status": "pending",
+            "details": "Add data consent management, right to be forgotten, data portability, privacy policy integration. Include data retention policies and consent tracking.",
+            "testStrategy": "Verify all privacy requirements are implemented and data handling is compliant."
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "title": "Mobile App Store Deployment and Distribution",
+        "description": "Prepare and deploy the app to iOS App Store and Google Play Store with proper metadata and assets.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [17],
+        "details": "Complete app store preparation including metadata, screenshots, app icons, store descriptions, and submission process for both platforms.",
+        "testStrategy": "Successfully deploy to both app stores and verify app functionality in production environment.",
+        "subtasks": [
+          {
+            "id": "18.1",
+            "title": "Prepare App Store Assets and Metadata",
+            "description": "Create all required assets, screenshots, and metadata for app store submissions.",
+            "status": "pending",
+            "details": "Create app icons for all sizes, launch screens, store screenshots for different devices, app descriptions, keywords, privacy policy. Include localized content for target markets.",
+            "testStrategy": "Verify all assets meet store requirements and display correctly."
+          },
+          {
+            "id": "18.2",
+            "title": "Configure App Store Connect and Play Console",
+            "description": "Set up developer accounts and configure app store listings.",
+            "status": "pending",
+            "details": "Set up Apple Developer and Google Play Developer accounts, configure app listings, set up in-app purchases if needed, configure app analytics and crash reporting.",
+            "testStrategy": "Verify store configurations are correct and ready for submission."
+          },
+          {
+            "id": "18.3",
+            "title": "Deploy and Monitor Production Release",
+            "description": "Deploy to production and monitor app performance and user feedback.",
+            "status": "pending",
+            "details": "Submit apps for review, monitor approval process, plan phased rollout, set up production monitoring, user feedback collection, and post-launch support processes.",
+            "testStrategy": "Successfully launch app and verify production performance meets expectations."
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-07-09T15:09:04.624Z",
+      "updated": "2025-07-09T15:17:57.602Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

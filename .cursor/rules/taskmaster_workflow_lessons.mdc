@@ -1,0 +1,103 @@
+# Taskmaster Workflow Lessons & Best Practices
+
+## **Critical Mistakes to Avoid**
+
+### **1. AI Tool Prerequisites Check**
+
+- **❌ DON'T:** Attempt AI-powered taskmaster operations (parse-prd, expand, research) without verifying API keys first
+- **✅ DO:** Always run `task-master models` to check API key status before using AI features
+- **✅ DO:** Configure working model with `task-master models --set-main=<model>` before AI operations
+- **Example:** If AI calls fail, immediately switch to manual task creation rather than repeating failed AI attempts
+
+### **2. Task Structure Validation**
+
+- **❌ DON'T:** Create complex nested task.json structures without testing CLI compatibility
+- **✅ DO:** Test `task-master list` immediately after creating/modifying tasks.json
+- **✅ DO:** Use simple task array structure that CLI can reliably parse
+- **✅ DO:** Verify task system works before declaring it ready
+
+### **3. Implementation Focus Over Planning**
+
+- **❌ DON'T:** Spend excessive time on task planning without actual code implementation
+- **✅ DO:** Start implementing code as soon as basic task structure is ready
+- **✅ DO:** Iterate between small implementation and task updates
+- **✅ DO:** Focus on deliverable code rather than perfect planning
+
+### **4. Progressive Task Completion**
+
+- **❌ DON'T:** Mark tasks as complete without actually implementing the code
+- **✅ DO:** Complete subtasks with actual code implementation
+- **✅ DO:** Use `task-master update-subtask` to log implementation progress
+- **✅ DO:** Mark subtasks as done only after code is working
+
+## **Workflow Best Practices**
+
+### **Starting New Development Sessions:**
+
+```bash
+# 1. Check current status
+task-master list
+
+# 2. Get next task
+task-master next
+
+# 3. Start working
+task-master set-status --id=<id> --status=in-progress
+
+# 4. Implement code, then log progress
+task-master update-subtask --id=<id> --prompt="Implementation details..."
+
+# 5. Mark complete only when code works
+task-master set-status --id=<id> --status=done
+```
+
+### **Implementation-First Approach:**
+
+- Write actual code for each subtask
+- Test the implementation works
+- Log findings with update-subtask
+- Only then mark as complete
+
+### **Error Recovery Patterns:**
+
+- If AI tools fail → Switch to manual approach immediately
+- If task structure fails → Simplify and test
+- If planning gets excessive → Start coding with basic structure
+
+## **Code Implementation Rules**
+
+### **For React Native/Expo Projects:**
+
+- Always test on both iOS and Android when possible
+- Use TypeScript with strict mode
+- Implement proper error handling
+- Add loading states for all async operations
+- Follow expo/react-native best practices
+
+### **File Organization:**
+
+- Create files in logical folder structure from subtask 1.4
+- Use index.ts files for clean imports
+- Maintain consistent naming conventions
+- Group related functionality together
+
+### **Quality Checks:**
+
+- Lint and format code as you go
+- Test basic functionality before marking complete
+- Commit working code after each major subtask
+- Update documentation as needed
+
+## **Task Management Integration:**
+
+- Use taskmaster to track actual implementation progress
+- Log real findings and challenges in subtasks
+- Update future tasks based on implementation learnings
+- Maintain clear status tracking
+
+**Remember: The goal is working code, not perfect plans. Implement first, refine later.**
+description:
+globs:
+alwaysApply: false
+
+---

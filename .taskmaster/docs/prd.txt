@@ -1,0 +1,255 @@
+# Pixoraa Hub - Agency Management App
+
+## Overview
+Pixoraa Hub is a comprehensive mobile application designed for Pixoraa craft agency to streamline their operations across AI/automation services, web development, app development, and design projects. The app serves as a centralized platform for project management, team communication, client relationship management, and business analytics. Built with React Native and Expo Go, it provides a scalable solution for managing agency workflows, improving team collaboration, and enhancing client satisfaction while maintaining real-time visibility into project progress and business metrics.
+
+## Core Features
+
+### 1. Authentication & User Management
+- Multi-role authentication system (Admin, Project Manager, Team Member, Client)
+- Secure login with email/password and biometric authentication
+- Role-based access control and permissions
+- User profile management with skills and availability tracking
+- Team member onboarding and access management
+
+### 2. Dashboard & Analytics
+- Real-time project overview with status indicators
+- Revenue analytics and financial KPIs
+- Team performance metrics and workload distribution
+- Client satisfaction scores and feedback summaries
+- Service-wise revenue breakdown and profitability analysis
+- Interactive charts and data visualizations
+
+### 3. Project Management System
+- Project creation with service categorization (AI/Automation, Web Dev, App Dev, Design)
+- Project timeline management with milestones and deadlines
+- Resource allocation and team assignment
+- Project status tracking (Proposal, Planning, In Progress, Review, Completed, On Hold)
+- Client project portal for transparency and collaboration
+- Project templates for common service types
+- Budget tracking and cost management
+
+### 4. Task Management & Workflow
+- Kanban-style task boards with drag-and-drop functionality
+- Task assignment with multiple assignees support
+- Task dependencies and prerequisite management
+- Priority levels (High, Medium, Low) and deadline tracking
+- Time tracking per task with start/stop functionality
+- Task templates for recurring work patterns
+- Subtask creation and nested task hierarchies
+- Task comments and collaboration threads
+
+### 5. Team Communication Hub
+- Real-time chat system (team channels, project-specific, direct messages)
+- File sharing and document collaboration
+- Video call integration for team meetings
+- Announcement system for company-wide communications
+- @mentions and push notifications
+- Message threading and search functionality
+- Integration with project tasks for contextual discussions
+
+### 6. Client Relationship Management
+- Comprehensive client profiles with contact information and history
+- Communication logs and interaction tracking
+- Contract management and document storage
+- Client feedback collection and satisfaction surveys
+- Client portal access for project visibility
+- Invoice and payment tracking per client
+- Client onboarding workflows
+
+### 7. Service Portfolio & Pricing
+- Service catalog management (AI/Automation, Web Services, App Development, Design)
+- Dynamic pricing templates and cost estimation tools
+- Proposal generation with customizable templates
+- Service delivery tracking and quality metrics
+- Package deals and bundle management
+- Client service history and preferences
+
+### 8. Financial Management
+- Invoice generation and automated billing
+- Expense tracking and categorization
+- Payment status monitoring and reminders
+- Profit margin analysis per project and service
+- Revenue forecasting and budget planning
+- Financial reporting and tax preparation support
+
+### 9. Resource & Schedule Management
+- Team calendar with availability tracking
+- Project scheduling and resource allocation
+- Leave management and time-off requests
+- Skill-based team member matching for projects
+- Workload balancing and capacity planning
+- Meeting scheduling and room booking
+
+## User Experience
+
+### User Personas
+1. **Agency Owner/Admin** - Needs overview of all operations, financial insights, and strategic planning tools
+2. **Project Manager** - Requires project oversight, team coordination, and client communication capabilities
+3. **Team Member** (Developer/Designer) - Needs task management, time tracking, and collaboration tools
+4. **Client** - Wants project visibility, communication access, and progress updates
+
+### Key User Flows
+1. **Project Creation Flow**: Admin/PM creates project → assigns team → sets milestones → client portal setup
+2. **Daily Work Flow**: Team member logs in → views assigned tasks → tracks time → collaborates via chat
+3. **Client Interaction Flow**: Client accesses portal → views progress → provides feedback → approves deliverables
+4. **Invoice Generation Flow**: Project completion → time/expense compilation → invoice generation → client billing
+
+### UI/UX Considerations
+- Modern, professional design reflecting Pixoraa's brand identity
+- Intuitive navigation with bottom tab bar for main sections
+- Responsive design supporting both mobile and tablet layouts
+- Dark/Light theme support for user preference
+- Accessibility compliance with screen readers and voice control
+- Offline functionality for core features with sync when connected
+- Progressive loading for optimal performance
+
+## Technical Architecture
+
+### Frontend Architecture
+- **Framework**: React Native with Expo SDK 49+
+- **Navigation**: Expo Router for file-based routing
+- **State Management**: Zustand for global state with React Query for server state
+- **UI Components**: React Native Paper for Material Design consistency
+- **Forms**: React Hook Form with validation schemas
+- **Animations**: React Native Reanimated for smooth interactions
+- **Storage**: Expo SecureStore for sensitive data, AsyncStorage for preferences
+
+### Backend Integration
+- **Database**: Supabase for real-time PostgreSQL database
+- **Authentication**: Supabase Auth with row-level security
+- **Real-time**: Supabase Realtime for live updates and chat
+- **File Storage**: Supabase Storage for documents and media
+- **API**: RESTful APIs with automatic OpenAPI documentation
+- **Push Notifications**: Expo Notifications with Supabase triggers
+
+### Data Models
+- **Users**: Profile, role, skills, availability, preferences
+- **Projects**: Details, status, timeline, budget, team assignments
+- **Tasks**: Description, assignees, dependencies, time tracking, comments
+- **Clients**: Contact info, projects, communication history, preferences
+- **Services**: Catalog, pricing, templates, delivery metrics
+- **Financial**: Invoices, expenses, payments, profit analysis
+
+### Security & Performance
+- Row-level security policies in Supabase
+- API rate limiting and request validation
+- Encrypted storage for sensitive data
+- Image optimization and lazy loading
+- Offline-first architecture with conflict resolution
+- Performance monitoring and crash reporting
+
+## Development Roadmap
+
+### Phase 1: Foundation & Core MVP (Weeks 1-4)
+- Project setup and development environment configuration
+- Basic authentication system with role management
+- Core navigation structure and basic UI components
+- User profile management and team member setup
+- Basic project creation and listing functionality
+- Simple task management with assignment capabilities
+
+### Phase 2: Project Management Core (Weeks 5-8)
+- Advanced project management features with timelines and milestones
+- Comprehensive task management with Kanban boards
+- Time tracking functionality with reporting
+- Basic client management and profile system
+- File upload and document management
+- Team communication foundation with basic chat
+
+### Phase 3: Communication & Collaboration (Weeks 9-12)
+- Real-time chat system with channels and direct messages
+- File sharing and collaborative document features
+- Advanced task management with dependencies and subtasks
+- Client portal development for project visibility
+- Push notifications and real-time updates
+- Basic reporting and analytics dashboard
+
+### Phase 4: Financial & Business Management (Weeks 13-16)
+- Invoice generation and billing system
+- Expense tracking and financial reporting
+- Advanced analytics and business intelligence dashboard
+- Service catalog and pricing management
+- Proposal generation and client communication tools
+- Advanced project templates and workflow automation
+
+### Phase 5: Enhancement & Optimization (Weeks 17-20)
+- Advanced resource management and scheduling
+- Mobile app optimization and performance tuning
+- Comprehensive testing and bug fixes
+- Advanced security features and compliance
+- Integration capabilities with external tools
+- Advanced reporting and data export features
+
+## Logical Dependency Chain
+
+### Foundation Layer (Must Build First)
+1. **Development Environment Setup** - Expo project, dependencies, and build configuration
+2. **Authentication System** - Core security foundation for all other features
+3. **Database Schema** - Supabase setup with all required tables and relationships
+4. **Basic Navigation** - Core app structure and routing system
+5. **User Management** - Profile creation and role assignment functionality
+
+### Core Business Logic Layer (Build Upon Foundation)
+1. **Project Management Core** - Essential project creation and management features
+2. **Task Management System** - Core task functionality that other features depend on
+3. **Team Management** - User assignment and collaboration foundations
+4. **Basic Client Management** - Client profiles and project associations
+
+### Feature Enhancement Layer (Build Upon Core)
+1. **Communication System** - Chat and collaboration features
+2. **Time Tracking** - Task-related time management
+3. **File Management** - Document and media handling
+4. **Client Portal** - External client access features
+
+### Business Intelligence Layer (Final Layer)
+1. **Financial Management** - Invoicing and financial tracking
+2. **Analytics Dashboard** - Business intelligence and reporting
+3. **Advanced Features** - Automation, integrations, and optimization
+
+## Risks and Mitigations
+
+### Technical Challenges
+- **Risk**: Supabase real-time performance with multiple concurrent users
+- **Mitigation**: Implement efficient subscription management and connection pooling
+- **Risk**: Mobile app performance with large datasets
+- **Mitigation**: Implement pagination, virtual scrolling, and data caching strategies
+
+### MVP Definition and Scope Management
+- **Risk**: Feature creep leading to delayed MVP delivery
+- **Mitigation**: Strictly define MVP as Phase 1-2 features with clear acceptance criteria
+- **Risk**: Over-engineering early features
+- **Mitigation**: Build minimal viable implementations that can be enhanced iteratively
+
+### Resource and Timeline Constraints
+- **Risk**: Development timeline extending beyond planned phases
+- **Mitigation**: Implement weekly milestone reviews with scope adjustment capabilities
+- **Risk**: Limited API key access for external services
+- **Mitigation**: Use mock data and local storage for development, implement service abstractions
+
+### User Adoption and Feedback
+- **Risk**: User interface not meeting team workflow expectations
+- **Mitigation**: Implement user feedback collection early and iterate based on actual usage patterns
+- **Risk**: Performance issues affecting daily operations
+- **Mitigation**: Implement monitoring and performance testing from Phase 1
+
+## Appendix
+
+### Research Findings
+- Agency management tools market analysis showing demand for mobile-first solutions
+- Team productivity studies highlighting importance of real-time communication
+- Client satisfaction research emphasizing transparency and progress visibility
+
+### Technical Specifications
+- Minimum supported iOS version: 13.0
+- Minimum supported Android version: API 21 (Android 5.0)
+- Target devices: Smartphones and tablets with 3GB+ RAM
+- Network requirements: 3G minimum, 4G/WiFi recommended for real-time features
+- Storage requirements: 500MB minimum, 2GB recommended for offline functionality
+
+### Integration Requirements
+- Supabase real-time subscriptions for live updates
+- Expo push notification service for user engagement
+- Device camera access for document scanning and profile photos
+- Calendar integration for scheduling and deadline management
+- Export capabilities for financial data and reporting 
