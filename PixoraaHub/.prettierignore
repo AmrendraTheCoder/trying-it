@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.expo/
+dist/
+build/
+ios/
+android/
+
+# Generated files
+*.tsbuildinfo
+*.d.ts
+
+# Package files
+package-lock.json
+yarn.lock
+
+# Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env*
+
+# IDE files
+.vscode/
+.idea/
+
+# Misc
+coverage/
+.nyc_output/ 

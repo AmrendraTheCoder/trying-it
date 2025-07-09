@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "Pixoraa Hub",
+    "slug": "pixoraa-hub",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "pixoraahub",
+    "userInterfaceStyle": "automatic",
+    "description": "Complete agency management solution for Pixoraa craft agency - handle AI/automation projects, web development, app development, and design services with team collaboration and client management.",
+    "keywords": [
+      "agency",
+      "project management",
+      "team collaboration",
+      "client management",
+      "ai",
+      "automation",
+      "web development"
+    ],
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pixoraa.hub",
+      "buildNumber": "1"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.pixoraa.hub",
+      "versionCode": 1,
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "pixoraa-hub-agency-management"
+      }
+    }
+  }
+}
