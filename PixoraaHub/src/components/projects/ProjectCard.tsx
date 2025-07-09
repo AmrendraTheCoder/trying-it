@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Project } from '../../types';
+import { Project, FileAttachment } from '../../types';
+import { FileService } from '../../services';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ProjectCardProps {
   project: Project;
   onPress: (project: Project) => void;
   onEdit?: (project: Project) => void;
   onDelete?: (project: Project) => void;
+  onViewDetails?: (project: Project) => void;
   showClient?: boolean;
 }
 
@@ -15,8 +18,28 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   onPress,
   onEdit,
   onDelete,
+  onViewDetails,
   showClient = true,
 }) => {
+  const [attachmentCount, setAttachmentCount] = useState(0);
+
+  useEffect(() => {
+    loadAttachmentCount();
+  }, [project.id]);
+
+  const loadAttachmentCount = async () => {
+    try {
+      const attachments = await FileService.getAttachments(
+        project.id,
+        'project'
+      );
+      setAttachmentCount(attachments.length);
+    } catch (error) {
+      console.error('Error loading attachment count:', error);
+      setAttachmentCount(0);
+    }
+  };
+
   const getStatusColor = (status: Project['status']) => {
     switch (status) {
       case 'active':
@@ -199,27 +222,55 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         </View>
       )}
 
-      {/* Action Buttons */}
-      {(onEdit || onDelete) && (
-        <View style={styles.actions}>
-          {onEdit && (
-            <TouchableOpacity
-              style={[styles.actionButton, styles.editButton]}
-              onPress={() => onEdit(project)}
-            >
-              <Text style={styles.editButtonText}>Edit</Text>
-            </TouchableOpacity>
-          )}
-          {onDelete && (
-            <TouchableOpacity
-              style={[styles.actionButton, styles.deleteButton]}
-              onPress={() => onDelete(project)}
-            >
-              <Text style={styles.deleteButtonText}>Delete</Text>
-            </TouchableOpacity>
-          )}
+      {/* Project Statistics */}
+      <View style={styles.statsContainer}>
+        <View style={styles.statItem}>
+          <Ionicons name='checkmark-circle-outline' size={16} color='#666' />
+          <Text style={styles.statText}>
+            {project.completedTasks || 0}/{project.taskCount || 0} tasks
+          </Text>
         </View>
-      )}
+
+        <View style={styles.statItem}>
+          <Ionicons name='attach-outline' size={16} color='#666' />
+          <Text style={styles.statText}>
+            {attachmentCount} file{attachmentCount !== 1 ? 's' : ''}
+          </Text>
+        </View>
+      </View>
+
+      {/* Action Buttons */}
+      <View style={styles.actions}>
+        {onViewDetails && (
+          <TouchableOpacity
+            style={[styles.actionButton, styles.viewButton]}
+            onPress={() => onViewDetails(project)}
+          >
+            <Ionicons name='eye-outline' size={14} color='#fff' />
+            <Text style={styles.viewButtonText}>View</Text>
+          </TouchableOpacity>
+        )}
+
+        {onEdit && (
+          <TouchableOpacity
+            style={[styles.actionButton, styles.editButton]}
+            onPress={() => onEdit(project)}
+          >
+            <Ionicons name='pencil-outline' size={14} color='#fff' />
+            <Text style={styles.editButtonText}>Edit</Text>
+          </TouchableOpacity>
+        )}
+
+        {onDelete && (
+          <TouchableOpacity
+            style={[styles.actionButton, styles.deleteButton]}
+            onPress={() => onDelete(project)}
+          >
+            <Ionicons name='trash-outline' size={14} color='#fff' />
+            <Text style={styles.deleteButtonText}>Delete</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </TouchableOpacity>
   );
 };
@@ -381,19 +432,48 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
     borderRadius: 3,
   },
+  statsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    marginBottom: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+  },
+  statItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 20,
+  },
+  statText: {
+    fontSize: 12,
+    color: '#666',
+    fontWeight: '500',
+    marginLeft: 6,
+  },
   actions: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: '#f0f0f0',
   },
   actionButton: {
-    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 6,
     marginLeft: 8,
+  },
+  viewButton: {
+    backgroundColor: '#007AFF',
+  },
+  viewButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 4,
   },
   editButton: {
     backgroundColor: '#2196F3',
@@ -402,6 +482,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
+    marginLeft: 4,
   },
   deleteButton: {
     backgroundColor: '#f44336',
@@ -410,5 +491,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
+    marginLeft: 4,
   },
 });

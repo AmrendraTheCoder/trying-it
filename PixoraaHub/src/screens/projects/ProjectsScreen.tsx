@@ -11,143 +11,48 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ProjectList, ProjectForm } from '../../components';
 import { Project, Client } from '../../types';
-
-// Mock clients data for project creation
-const mockClients: Client[] = [
-  {
-    id: '1',
-    name: 'John Smith',
-    email: 'john.smith@example.com',
-    company: 'Tech Solutions Inc.',
-    status: 'active',
-    projectCount: 3,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-10',
-  },
-  {
-    id: '2',
-    name: 'Sarah Johnson',
-    email: 'sarah@creativestudio.com',
-    company: 'Creative Studio',
-    status: 'active',
-    projectCount: 2,
-    createdAt: '2024-01-05',
-    updatedAt: '2024-01-08',
-  },
-  {
-    id: '3',
-    name: 'Mike Brown',
-    email: 'mike.brown@startup.io',
-    company: 'Innovation Startup',
-    status: 'active',
-    projectCount: 1,
-    createdAt: '2024-01-12',
-    updatedAt: '2024-01-12',
-  },
-];
-
-// Mock projects data
-const mockProjects: Project[] = [
-  {
-    id: '1',
-    title: 'E-commerce Platform Redesign',
-    description:
-      'Complete overhaul of the existing e-commerce platform with modern UI/UX and improved performance.',
-    clientId: '1',
-    clientName: 'Tech Solutions Inc.',
-    status: 'active',
-    priority: 'high',
-    startDate: '2024-01-15',
-    deadline: '2024-04-15',
-    budget: 15000,
-    totalSpent: 8500,
-    hourlyRate: 75,
-    estimatedHours: 200,
-    taskCount: 12,
-    completedTasks: 7,
-    notes: 'Client is very responsive and provides timely feedback.',
-    createdAt: '2024-01-10',
-    updatedAt: '2024-01-20',
-  },
-  {
-    id: '2',
-    title: 'Mobile App Development',
-    description: 'Native iOS and Android app for creative portfolio showcase.',
-    clientId: '2',
-    clientName: 'Creative Studio',
-    status: 'active',
-    priority: 'medium',
-    startDate: '2024-01-20',
-    endDate: '2024-03-20',
-    deadline: '2024-03-25',
-    budget: 12000,
-    totalSpent: 3000,
-    hourlyRate: 80,
-    estimatedHours: 150,
-    taskCount: 8,
-    completedTasks: 2,
-    notes: 'First mobile project with this client.',
-    createdAt: '2024-01-15',
-    updatedAt: '2024-01-22',
-  },
-  {
-    id: '3',
-    title: 'Website Maintenance',
-    description: 'Ongoing maintenance and updates for startup website.',
-    clientId: '3',
-    clientName: 'Innovation Startup',
-    status: 'on_hold',
-    priority: 'low',
-    startDate: '2024-01-01',
-    budget: 2000,
-    totalSpent: 1200,
-    hourlyRate: 60,
-    estimatedHours: 40,
-    taskCount: 5,
-    completedTasks: 3,
-    notes: 'On hold due to client budget constraints.',
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-25',
-  },
-  {
-    id: '4',
-    title: 'API Integration Project',
-    description: 'Integration of third-party APIs for data synchronization.',
-    clientId: '1',
-    clientName: 'Tech Solutions Inc.',
-    status: 'completed',
-    priority: 'medium',
-    startDate: '2023-12-01',
-    endDate: '2024-01-10',
-    budget: 5000,
-    totalSpent: 4800,
-    hourlyRate: 75,
-    estimatedHours: 67,
-    taskCount: 6,
-    completedTasks: 6,
-    notes: 'Successfully completed ahead of schedule.',
-    createdAt: '2023-11-25',
-    updatedAt: '2024-01-10',
-  },
-];
+import { ProjectService, ClientService } from '../../services';
 
 export const ProjectsScreen: React.FC = () => {
-  const [projects, setProjects] = useState<Project[]>(mockProjects);
-  const [clients] = useState<Client[]>(mockClients);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | undefined>();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Simulate loading initial data
+  // Load initial data when component mounts
   useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    loadData();
   }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+
+      // Initialize and load both projects and clients
+      await Promise.all([
+        ProjectService.initializeProjects(),
+        ClientService.initializeClients(),
+      ]);
+
+      const [projectData, clientData] = await Promise.all([
+        ProjectService.getAllProjects(),
+        ClientService.getAllClients(),
+      ]);
+
+      setProjects(projectData);
+      setClients(clientData);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      Alert.alert(
+        'Error',
+        'Failed to load projects and clients. Please try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleProjectPress = (project: Project) => {
     const statusText = project.status.replace('_', ' ').toUpperCase();
@@ -189,6 +94,38 @@ export const ProjectsScreen: React.FC = () => {
     setShowForm(true);
   };
 
+  const handleViewProjectDetails = (project: Project) => {
+    const statusText = project.status.replace('_', ' ').toUpperCase();
+    const priorityText = project.priority.toUpperCase();
+    const budgetText = project.budget
+      ? `$${project.budget.toLocaleString()}`
+      : 'Not set';
+    const spentText = `$${(project.totalSpent || 0).toLocaleString()}`;
+    const progressText =
+      (project.taskCount || 0) > 0
+        ? `${project.completedTasks || 0}/${project.taskCount} tasks completed`
+        : 'No tasks yet';
+
+    Alert.alert(
+      `${project.title} - Details`,
+      `Client: ${project.clientName}\nStatus: ${statusText}\nPriority: ${priorityText}\nBudget: ${budgetText}\nSpent: ${spentText}\nProgress: ${progressText}\n\nDescription: ${project.description || 'No description'}`,
+      [
+        { text: 'Close', style: 'cancel' },
+        { text: 'Edit', onPress: () => handleEditProject(project) },
+        {
+          text: 'Manage Files',
+          onPress: () => {
+            // TODO: Navigate to file management screen
+            Alert.alert(
+              'File Management',
+              'File management feature coming soon!'
+            );
+          },
+        },
+      ]
+    );
+  };
+
   const handleDeleteProject = (project: Project) => {
     Alert.alert(
       'Delete Project',
@@ -198,49 +135,71 @@ export const ProjectsScreen: React.FC = () => {
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: () => {
-            setProjects(prev => prev.filter(p => p.id !== project.id));
+          onPress: async () => {
+            try {
+              setLoading(true);
+              const success = await ProjectService.deleteProject(project.id);
+              if (success) {
+                setProjects(prev => prev.filter(p => p.id !== project.id));
+                // Refresh clients to update project counts
+                const updatedClients = await ClientService.getAllClients();
+                setClients(updatedClients);
+                Alert.alert('Success', 'Project deleted successfully.');
+              } else {
+                Alert.alert('Error', 'Project not found.');
+              }
+            } catch (error) {
+              console.error('Error deleting project:', error);
+              Alert.alert(
+                'Error',
+                'Failed to delete project. Please try again.'
+              );
+            } finally {
+              setLoading(false);
+            }
           },
         },
       ]
     );
   };
 
-  const handleFormSubmit = (
+  const handleFormSubmit = async (
     projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>
   ) => {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    // Simulate API call delay
-    setTimeout(() => {
       if (editingProject) {
         // Update existing project
-        setProjects(prev =>
-          prev.map(p =>
-            p.id === editingProject.id
-              ? {
-                  ...p,
-                  ...projectData,
-                  updatedAt: new Date().toISOString(),
-                }
-              : p
-          )
+        const updatedProject = await ProjectService.updateProject(
+          editingProject.id,
+          projectData
         );
+        if (updatedProject) {
+          setProjects(prev =>
+            prev.map(p => (p.id === editingProject.id ? updatedProject : p))
+          );
+          Alert.alert('Success', 'Project updated successfully.');
+        }
       } else {
         // Add new project
-        const newProject: Project = {
-          ...projectData,
-          id: Date.now().toString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
+        const newProject = await ProjectService.addProject(projectData);
         setProjects(prev => [newProject, ...prev]);
+        Alert.alert('Success', 'Project added successfully.');
       }
 
-      setLoading(false);
+      // Refresh clients to update project counts
+      const updatedClients = await ClientService.getAllClients();
+      setClients(updatedClients);
+
       setShowForm(false);
       setEditingProject(undefined);
-    }, 1500);
+    } catch (error) {
+      console.error('Error saving project:', error);
+      Alert.alert('Error', 'Failed to save project. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleFormCancel = () => {
@@ -248,26 +207,41 @@ export const ProjectsScreen: React.FC = () => {
     setEditingProject(undefined);
   };
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    // Simulate refresh
-    setTimeout(() => {
+  const handleRefresh = async () => {
+    try {
+      setRefreshing(true);
+      const [projectData, clientData] = await Promise.all([
+        ProjectService.getAllProjects(),
+        ClientService.getAllClients(),
+      ]);
+      setProjects(projectData);
+      setClients(clientData);
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      Alert.alert('Error', 'Failed to refresh data. Please try again.');
+    } finally {
       setRefreshing(false);
-    }, 1000);
+    }
   };
 
   const getProjectStats = () => {
-    const total = projects.length;
-    const active = projects.filter(p => p.status === 'active').length;
-    const completed = projects.filter(p => p.status === 'completed').length;
-    const onHold = projects.filter(p => p.status === 'on_hold').length;
+    const activeProjects = projects.filter(p => p.status === 'active').length;
+    const completedProjects = projects.filter(
+      p => p.status === 'completed'
+    ).length;
     const totalBudget = projects.reduce((sum, p) => sum + (p.budget || 0), 0);
     const totalSpent = projects.reduce(
       (sum, p) => sum + (p.totalSpent || 0),
       0
     );
 
-    return { total, active, completed, onHold, totalBudget, totalSpent };
+    return {
+      total: projects.length,
+      active: activeProjects,
+      completed: completedProjects,
+      totalBudget,
+      totalSpent,
+    };
   };
 
   const stats = getProjectStats();
@@ -275,50 +249,28 @@ export const ProjectsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle='dark-content' />
-      {/* Header with Add Button and Stats */}
+      {/* Header with Stats and Add Button */}
       <View style={styles.header}>
-        <View style={styles.headerLeft}>
+        <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Projects</Text>
-          <Text style={styles.headerStats}>
-            {stats.active} Active • {stats.completed} Completed • {stats.onHold}{' '}
-            On Hold
-          </Text>
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.total}</Text>
+              <Text style={styles.statLabel}>Total</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.active}</Text>
+              <Text style={styles.statLabel}>Active</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.completed}</Text>
+              <Text style={styles.statLabel}>Done</Text>
+            </View>
+          </View>
         </View>
         <TouchableOpacity style={styles.addButton} onPress={handleAddProject}>
           <Text style={styles.addButtonText}>+ Add Project</Text>
         </TouchableOpacity>
-      </View>
-
-      {/* Budget Summary */}
-      <View style={styles.budgetSummary}>
-        <View style={styles.budgetItem}>
-          <Text style={styles.budgetLabel}>Total Budget</Text>
-          <Text style={styles.budgetValue}>
-            ${stats.totalBudget.toLocaleString()}
-          </Text>
-        </View>
-        <View style={styles.budgetItem}>
-          <Text style={styles.budgetLabel}>Total Spent</Text>
-          <Text
-            style={[
-              styles.budgetValue,
-              stats.totalSpent > stats.totalBudget && styles.overBudget,
-            ]}
-          >
-            ${stats.totalSpent.toLocaleString()}
-          </Text>
-        </View>
-        <View style={styles.budgetItem}>
-          <Text style={styles.budgetLabel}>Remaining</Text>
-          <Text
-            style={[
-              styles.budgetValue,
-              stats.totalBudget - stats.totalSpent < 0 && styles.overBudget,
-            ]}
-          >
-            ${(stats.totalBudget - stats.totalSpent).toLocaleString()}
-          </Text>
-        </View>
       </View>
 
       {/* Project List */}
@@ -327,11 +279,11 @@ export const ProjectsScreen: React.FC = () => {
         onProjectPress={handleProjectPress}
         onEditProject={handleEditProject}
         onDeleteProject={handleDeleteProject}
+        onViewDetails={handleViewProjectDetails}
         onAddProject={handleAddProject}
         loading={loading}
         refreshing={refreshing}
         onRefresh={handleRefresh}
-        showClient={true}
       />
 
       {/* Project Form Modal */}
@@ -339,17 +291,14 @@ export const ProjectsScreen: React.FC = () => {
         visible={showForm}
         animationType='slide'
         presentationStyle='pageSheet'
-        onRequestClose={handleFormCancel}
       >
-        <View style={styles.modalContainer}>
-          <ProjectForm
-            project={editingProject}
-            clients={clients}
-            onSubmit={handleFormSubmit}
-            onCancel={handleFormCancel}
-            loading={loading}
-          />
-        </View>
+        <ProjectForm
+          project={editingProject}
+          clients={clients}
+          onSubmit={handleFormSubmit}
+          onCancel={handleFormCancel}
+          loading={loading}
+        />
       </Modal>
     </SafeAreaView>
   );
@@ -361,67 +310,49 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
     backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
-  headerLeft: {
-    flex: 1,
+  headerContent: {
+    marginBottom: 12,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 24,
+    fontWeight: 'bold',
     color: '#333',
-    marginBottom: 4,
+    marginBottom: 12,
   },
-  headerStats: {
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+  },
+  statItem: {
+    alignItems: 'center',
+    marginRight: 24,
+  },
+  statNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#007AFF',
+  },
+  statLabel: {
     fontSize: 12,
     color: '#666',
+    marginTop: 2,
   },
   addButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#007AFF',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
-    marginLeft: 16,
+    alignSelf: 'flex-end',
   },
   addButtonText: {
     color: '#fff',
+    fontWeight: '600',
     fontSize: 14,
-    fontWeight: '600',
-  },
-  budgetSummary: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  budgetItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  budgetLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
-  },
-  budgetValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  overBudget: {
-    color: '#f44336',
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
   },
 });

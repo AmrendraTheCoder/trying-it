@@ -17,6 +17,7 @@ interface ClientListProps {
   onClientPress: (client: Client) => void;
   onEditClient?: (client: Client) => void;
   onDeleteClient?: (client: Client) => void;
+  onViewDetails?: (client: Client) => void;
   onAddClient?: () => void;
   loading?: boolean;
   refreshing?: boolean;
@@ -28,6 +29,7 @@ export const ClientList: React.FC<ClientListProps> = ({
   onClientPress,
   onEditClient,
   onDeleteClient,
+  onViewDetails,
   onAddClient,
   loading: _loading,
   refreshing = false,
@@ -85,6 +87,7 @@ export const ClientList: React.FC<ClientListProps> = ({
       onPress={onClientPress}
       onEdit={onEditClient}
       onDelete={handleDeleteClient}
+      onViewDetails={onViewDetails}
     />
   );
 
