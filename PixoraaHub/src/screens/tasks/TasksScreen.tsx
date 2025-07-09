@@ -1,37 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Modal, Alert, StatusBar } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Modal,
+  Alert,
+  StatusBar,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TaskList, TaskForm } from '../../components';
 import { Task, Project } from '../../types';
 import { TaskService, ProjectService } from '../../services';
 import {
-  ProfessionalHeader,
   EnhancedThemedText,
-  StatCard,
-  StatusBadge,
 } from '../../../components/ui';
-import { Colors, Spacing } from '../../../constants/Colors';
+import { Colors, Spacing, BorderRadius, Shadows } from '../../../constants/Colors';
 import { useThemeColor } from '../../../hooks/useThemeColor';
+
+const { width } = Dimensions.get('window');
 
 export const TasksScreen: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | undefined>();
-  const [loading, setLoading] = useState(true);
+  const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
   const [refreshing, setRefreshing] = useState(false);
 
   const backgroundColor = useThemeColor({}, 'background');
 
-  // Load initial data when component mounts
   useEffect(() => {
     loadData();
   }, []);
 
   const loadData = async () => {
     try {
-      setLoading(true);
-
       // Initialize and load both tasks and projects
       await Promise.all([
         TaskService.initializeTasks(),
@@ -51,37 +54,16 @@ export const TasksScreen: React.FC = () => {
         'Error',
         'Failed to load tasks and projects. Please try again.'
       );
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleTaskPress = (task: Task) => {
-    const statusText = task.status.replace('_', ' ').toUpperCase();
-    const priorityText = task.priority.toUpperCase();
-    const dueDateText = task.dueDate
-      ? new Date(task.dueDate).toLocaleDateString()
-      : 'No due date';
-
-    Alert.alert(
-      task.title,
-      `Status: ${statusText}\nPriority: ${priorityText}\nDue Date: ${dueDateText}\n\nDescription: ${task.description || 'No description'}`,
-      [
-        { text: 'Close', style: 'cancel' },
-        { text: 'Edit', onPress: () => handleEditTask(task) },
-      ]
-    );
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
   };
 
   const handleAddTask = () => {
-    if (projects.length === 0) {
-      Alert.alert(
-        'No Projects Available',
-        'You need to add at least one project before creating a task.',
-        [{ text: 'OK', style: 'default' }]
-      );
-      return;
-    }
     setEditingTask(undefined);
     setShowForm(true);
   };
@@ -91,39 +73,10 @@ export const TasksScreen: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleViewTaskDetails = (task: Task) => {
-    const statusText = task.status.replace('_', ' ').toUpperCase();
-    const priorityText = task.priority.toUpperCase();
-    const dueDateText = task.dueDate
-      ? new Date(task.dueDate).toLocaleDateString()
-      : 'No due date';
-    const project = projects.find(p => p.id === task.projectId);
-    const projectTitle = project?.title || 'No project';
-
-    Alert.alert(
-      `${task.title} - Details`,
-      `Status: ${statusText}\nPriority: ${priorityText}\nDue Date: ${dueDateText}\nProject: ${projectTitle}\n\nDescription: ${task.description || 'No description'}`,
-      [
-        { text: 'Close', style: 'cancel' },
-        { text: 'Edit', onPress: () => handleEditTask(task) },
-        {
-          text: 'Manage Files',
-          onPress: () => {
-            // TODO: Navigate to file management screen
-            Alert.alert(
-              'File Management',
-              'File management feature coming soon!'
-            );
-          },
-        },
-      ]
-    );
-  };
-
   const handleDeleteTask = (task: Task) => {
     Alert.alert(
       'Delete Task',
-      `Are you sure you want to delete "${task.title}"? This action cannot be undone.`,
+      `Are you sure you want to delete "${task.title}"?`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -131,19 +84,11 @@ export const TasksScreen: React.FC = () => {
           style: 'destructive',
           onPress: async () => {
             try {
-              setLoading(true);
-              const success = await TaskService.deleteTask(task.id);
-              if (success) {
-                setTasks(prev => prev.filter(t => t.id !== task.id));
-                Alert.alert('Success', 'Task deleted successfully.');
-              } else {
-                Alert.alert('Error', 'Task not found.');
-              }
+              await TaskService.deleteTask(task.id);
+              await loadData();
             } catch (error) {
               console.error('Error deleting task:', error);
               Alert.alert('Error', 'Failed to delete task. Please try again.');
-            } finally {
-              setLoading(false);
             }
           },
         },
@@ -151,36 +96,27 @@ export const TasksScreen: React.FC = () => {
     );
   };
 
+  const handleTaskPress = (task: Task) => {
+    console.log('Selected task:', task);
+  };
+
+  const handleViewTaskDetails = (task: Task) => {
+    console.log('View task details:', task);
+  };
+
   const handleFormSubmit = async (taskData: any) => {
     try {
-      setLoading(true);
-
       if (editingTask) {
-        // Update existing task
-        const updatedTask = await TaskService.updateTask(
-          editingTask.id,
-          taskData
-        );
-        if (updatedTask) {
-          setTasks(prev =>
-            prev.map(t => (t.id === editingTask.id ? updatedTask : t))
-          );
-          Alert.alert('Success', 'Task updated successfully.');
-        }
+        await TaskService.updateTask(editingTask.id, taskData);
       } else {
-        // Add new task
-        const newTask = await TaskService.addTask(taskData);
-        setTasks(prev => [newTask, ...prev]);
-        Alert.alert('Success', 'Task added successfully.');
+        await TaskService.createTask(taskData);
       }
-
       setShowForm(false);
       setEditingTask(undefined);
+      await loadData();
     } catch (error) {
       console.error('Error saving task:', error);
       Alert.alert('Error', 'Failed to save task. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -189,196 +125,151 @@ export const TasksScreen: React.FC = () => {
     setEditingTask(undefined);
   };
 
-  const handleRefresh = async () => {
-    try {
-      setRefreshing(true);
-
-      const [taskData, projectData] = await Promise.all([
-        TaskService.getAllTasks(),
-        ProjectService.getAllProjects(),
-      ]);
-
-      setTasks(taskData);
-      setProjects(projectData);
-    } catch (error) {
-      console.error('Error refreshing data:', error);
-      Alert.alert('Error', 'Failed to refresh data. Please try again.');
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
-  // Calculate task statistics
+  // Calculate stats
   const todoTasks = tasks.filter(t => t.status === 'todo').length;
   const inProgressTasks = tasks.filter(t => t.status === 'in_progress').length;
   const completedTasks = tasks.filter(t => t.status === 'completed').length;
   const overdueTasks = tasks.filter(
     t =>
-      t.dueDate && new Date(t.dueDate) < new Date() && t.status !== 'completed'
-  ).length;
-
-  const highPriorityTasks = tasks.filter(
-    t => t.priority === 'high' && t.status !== 'completed'
-  ).length;
-  const todayTasks = tasks.filter(
-    t =>
       t.dueDate &&
-      new Date(t.dueDate).toDateString() === new Date().toDateString() &&
-      t.status !== 'completed'
+      new Date(t.dueDate) < new Date() &&
+      t.status !== 'completed' &&
+      t.status !== 'cancelled'
   ).length;
+  const highPriorityTasks = tasks.filter(t => t.priority === 'high' || t.priority === 'urgent').length;
+
+  // Metric Card Component
+  const MetricCard: React.FC<{
+    title: string;
+    value: string | number;
+    subtitle?: string;
+    color?: string;
+  }> = ({ title, value, subtitle, color = Colors.light.primary }) => (
+    <View style={[styles.metricCard]}>
+      <View style={styles.metricContent}>
+        <EnhancedThemedText type="caption" color="secondary" style={styles.metricTitle}>
+          {title}
+        </EnhancedThemedText>
+        <EnhancedThemedText type="heading3" style={[styles.metricValue, { color }]}>
+          {value}
+        </EnhancedThemedText>
+        {subtitle && (
+          <EnhancedThemedText type="small" color="muted" style={styles.metricSubtitle}>
+            {subtitle}
+          </EnhancedThemedText>
+        )}
+      </View>
+    </View>
+  );
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
-      <StatusBar barStyle='dark-content' backgroundColor={backgroundColor} />
+      <StatusBar barStyle="dark-content" backgroundColor={backgroundColor} />
+      
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <EnhancedThemedText type="heading1" style={styles.title}>
+            Tasks
+          </EnhancedThemedText>
+          <EnhancedThemedText type="body" color="secondary" style={styles.subtitle}>
+            Manage your task workflow
+          </EnhancedThemedText>
+        </View>
+        <TouchableOpacity style={styles.addButton} onPress={handleAddTask}>
+          <EnhancedThemedText type="bodySemiBold" style={styles.addButtonText}>
+            + Add Task
+          </EnhancedThemedText>
+        </TouchableOpacity>
+      </View>
 
-      <ProfessionalHeader
-        title='Tasks'
-        subtitle={`${tasks.length} tasks across ${projects.length} projects`}
-        rightButton={{
-          title: '+ New Task',
-          onPress: handleAddTask,
-          variant: 'primary',
-        }}
-      />
-
-      <View style={styles.container}>
-        {/* Task Statistics */}
-        {tasks.length > 0 && (
-          <View style={styles.statsSection}>
-            <EnhancedThemedText type='heading4' style={styles.sectionTitle}>
-              Overview
-            </EnhancedThemedText>
-            <View style={styles.statsGrid}>
-              <StatCard
-                title='To Do'
-                value={todoTasks}
-                subtitle={`${tasks.length} total`}
-                color={Colors.light.info}
-              />
-              <StatCard
-                title='In Progress'
-                value={inProgressTasks}
-                subtitle='Active work'
-                color={Colors.light.primary}
-              />
-            </View>
-            <View style={styles.statsGrid}>
-              <StatCard
-                title='Completed'
-                value={completedTasks}
-                subtitle='This period'
-                color={Colors.light.success}
-              />
-              <StatCard
-                title='Overdue'
-                value={overdueTasks}
-                subtitle='Need attention'
-                color={Colors.light.error}
-              />
-            </View>
+      {/* Stats Overview */}
+      {tasks.length > 0 && (
+        <View style={styles.statsSection}>
+          <View style={styles.statsGrid}>
+            <MetricCard
+              title="To Do"
+              value={todoTasks}
+              subtitle={`${tasks.length} total`}
+              color={Colors.light.info}
+            />
+            <MetricCard
+              title="In Progress"
+              value={inProgressTasks}
+              subtitle="Active"
+              color={Colors.light.warning}
+            />
           </View>
-        )}
-
-        {/* Priority & Schedule */}
-        {tasks.length > 0 && (
-          <View style={styles.prioritySection}>
-            <EnhancedThemedText type='heading4' style={styles.sectionTitle}>
-              Priority & Schedule
-            </EnhancedThemedText>
-            <View style={styles.statsGrid}>
-              <StatCard
-                title='High Priority'
-                value={highPriorityTasks}
-                subtitle='Urgent tasks'
-                color={Colors.light.warning}
-              />
-              <StatCard
-                title='Due Today'
-                value={todayTasks}
-                subtitle='Focus items'
-                color={Colors.light.secondary}
-              />
-            </View>
+          
+          <View style={styles.statsGrid}>
+            <MetricCard
+              title="Completed"
+              value={completedTasks}
+              subtitle="Finished"
+              color={Colors.light.success}
+            />
+            <MetricCard
+              title="Overdue"
+              value={overdueTasks}
+              subtitle="Need attention"
+              color={Colors.light.error}
+            />
           </View>
-        )}
 
-        {/* Task Status Summary */}
-        {tasks.length > 0 && (
-          <View style={styles.statusSection}>
-            <EnhancedThemedText type='heading4' style={styles.sectionTitle}>
-              Status Summary
-            </EnhancedThemedText>
-            <View style={styles.statusBadgesContainer}>
-              <View style={styles.statusBadgeItem}>
-                <StatusBadge status='todo' />
-                <EnhancedThemedText
-                  type='caption'
-                  color='secondary'
-                  style={styles.statusCount}
-                >
-                  {todoTasks}
-                </EnhancedThemedText>
-              </View>
-              <View style={styles.statusBadgeItem}>
-                <StatusBadge status='in_progress' />
-                <EnhancedThemedText
-                  type='caption'
-                  color='secondary'
-                  style={styles.statusCount}
-                >
-                  {inProgressTasks}
-                </EnhancedThemedText>
-              </View>
-              <View style={styles.statusBadgeItem}>
-                <StatusBadge status='completed' />
-                <EnhancedThemedText
-                  type='caption'
-                  color='secondary'
-                  style={styles.statusCount}
-                >
-                  {completedTasks}
-                </EnhancedThemedText>
-              </View>
-            </View>
+          <View style={styles.statsGrid}>
+            <MetricCard
+              title="High Priority"
+              value={highPriorityTasks}
+              subtitle="Urgent tasks"
+              color={Colors.light.accent}
+            />
+            <MetricCard
+              title="Due Today"
+              value={tasks.filter(t => {
+                const today = new Date().toDateString();
+                return t.dueDate && new Date(t.dueDate).toDateString() === today && t.status !== 'completed';
+              }).length}
+              subtitle="Today's tasks"
+              color={Colors.light.primary}
+            />
           </View>
-        )}
+        </View>
+      )}
 
+      {/* Task List */}
+      <View style={styles.content}>
+        <TaskList
+          tasks={tasks}
+          projects={projects}
+          onTaskPress={handleTaskPress}
+          onTaskEdit={handleEditTask}
+          onTaskDelete={(taskId: string) => {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) handleDeleteTask(task);
+          }}
+          onViewDetails={handleViewTaskDetails}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+        />
+        
         {/* Task List Header */}
-        <View style={styles.listHeader}>
-          <EnhancedThemedText type='heading4'>All Tasks</EnhancedThemedText>
-          {tasks.length > 0 && (
-            <EnhancedThemedText type='caption' color='secondary'>
-              {inProgressTasks} active • {overdueTasks} overdue
+        {tasks.length > 0 && (
+          <View style={styles.listHeader}>
+            <EnhancedThemedText type="heading4">
+              All Tasks ({tasks.length})
             </EnhancedThemedText>
-          )}
-        </View>
-
-        <View style={styles.listContainer}>
-          <TaskList
-            tasks={tasks}
-            projects={projects}
-            onTaskPress={handleTaskPress}
-            onTaskEdit={(taskId: string) => {
-              const task = tasks.find(t => t.id === taskId);
-              if (task) handleEditTask(task);
-            }}
-            onTaskDelete={(taskId: string) => {
-              const task = tasks.find(t => t.id === taskId);
-              if (task) handleDeleteTask(task);
-            }}
-            onViewDetails={handleViewTaskDetails}
-            loading={loading}
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-          />
-        </View>
+            <EnhancedThemedText type="caption" color="secondary">
+              {todoTasks} todo • {inProgressTasks} in progress • {completedTasks} completed
+            </EnhancedThemedText>
+          </View>
+        )}
       </View>
 
       {/* Task Form Modal */}
       <Modal
         visible={showForm}
-        animationType='slide'
-        presentationStyle='pageSheet'
+        animationType="slide"
+        presentationStyle="pageSheet"
       >
         <TaskForm
           visible={showForm}
@@ -396,56 +287,71 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollView: {
+  header: {
+    paddingHorizontal: Spacing.screenPadding,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.lg,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  headerContent: {
     flex: 1,
+    paddingRight: Spacing.md,
+  },
+  title: {
+    marginBottom: Spacing.xs,
+  },
+  subtitle: {
+    lineHeight: 20,
+  },
+  addButton: {
+    backgroundColor: Colors.light.primary,
+    borderRadius: BorderRadius.round,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    ...Shadows.sm,
+  },
+  addButtonText: {
+    color: Colors.light.textInverse,
   },
   statsSection: {
-    paddingHorizontal: Spacing.md,
+    paddingHorizontal: Spacing.screenPadding,
     marginBottom: Spacing.lg,
-  },
-  prioritySection: {
-    paddingHorizontal: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  sectionTitle: {
-    marginBottom: Spacing.md,
+    gap: Spacing.sm,
   },
   statsGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: Spacing.md,
-    marginBottom: Spacing.md,
+    gap: Spacing.sm,
   },
-  statusSection: {
-    paddingHorizontal: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  statusBadgesContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  statusBadgeItem: {
-    alignItems: 'center',
-  },
-  statusCount: {
-    marginTop: Spacing.xs / 2,
-  },
-  listSection: {
+  metricCard: {
+    backgroundColor: Colors.light.surfaceSecondary,
+    borderRadius: BorderRadius.lg,
     flex: 1,
-    paddingHorizontal: Spacing.md,
+    ...Shadows.sm,
+  },
+  metricContent: {
+    padding: Spacing.cardPadding,
+    minHeight: 70,
+    justifyContent: 'center',
+  },
+  metricTitle: {
+    marginBottom: Spacing.xs,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  metricValue: {
+    marginBottom: Spacing.xs / 2,
+  },
+  metricSubtitle: {
+    lineHeight: 14,
+  },
+  content: {
+    flex: 1,
   },
   listHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.md,
-    paddingHorizontal: Spacing.md,
-  },
-  listContainer: {
-    flex: 1,
-  },
-  bottomSpacer: {
-    height: Spacing.xl,
+    paddingHorizontal: Spacing.screenPadding,
+    paddingBottom: Spacing.md,
+    gap: Spacing.xs / 2,
   },
 });

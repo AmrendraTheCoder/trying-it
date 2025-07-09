@@ -1,54 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Modal, Alert, StatusBar } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Modal,
+  Alert,
+  StatusBar,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ClientList, ClientForm } from '../../components';
 import { Client } from '../../types';
 import { ClientService } from '../../services';
+import { EnhancedThemedText } from '../../../components/ui';
 import {
-  ProfessionalHeader,
-  EnhancedThemedText,
-  StatCard,
-} from '../../../components/ui';
-import { Colors, Spacing } from '../../../constants/Colors';
+  Colors,
+  Spacing,
+  BorderRadius,
+  Shadows,
+} from '../../../constants/Colors';
 import { useThemeColor } from '../../../hooks/useThemeColor';
+
+const { width } = Dimensions.get('window');
 
 export const ClientsScreen: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [editingClient, setEditingClient] = useState<Client | undefined>();
-  const [loading, setLoading] = useState(true);
+  const [editingClient, setEditingClient] = useState<Client | undefined>(
+    undefined
+  );
   const [refreshing, setRefreshing] = useState(false);
 
   const backgroundColor = useThemeColor({}, 'background');
 
-  // Load initial data when component mounts
   useEffect(() => {
     loadClients();
   }, []);
 
   const loadClients = async () => {
     try {
-      setLoading(true);
-      await ClientService.initializeClients(); // Ensure default clients exist
+      await ClientService.initializeClients();
       const clientData = await ClientService.getAllClients();
       setClients(clientData);
     } catch (error) {
       console.error('Error loading clients:', error);
       Alert.alert('Error', 'Failed to load clients. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleClientPress = (client: Client) => {
-    Alert.alert(
-      client.name,
-      `Email: ${client.email}\nStatus: ${client.status}\nProjects: ${client.projectCount || 0}`,
-      [
-        { text: 'Close', style: 'cancel' },
-        { text: 'Edit', onPress: () => handleEditClient(client) },
-      ]
-    );
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadClients();
+    setRefreshing(false);
   };
 
   const handleAddClient = () => {
@@ -61,31 +64,10 @@ export const ClientsScreen: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleViewClientDetails = (client: Client) => {
-    Alert.alert(
-      `${client.name} - Details`,
-      `Email: ${client.email}\nCompany: ${client.company || 'N/A'}\nPhone: ${client.phone || 'N/A'}\nStatus: ${client.status}\nProjects: ${client.projectCount || 0}`,
-      [
-        { text: 'Close', style: 'cancel' },
-        { text: 'Edit', onPress: () => handleEditClient(client) },
-        {
-          text: 'View Files',
-          onPress: () => {
-            // TODO: Navigate to file management screen
-            Alert.alert(
-              'File Management',
-              'File management feature coming soon!'
-            );
-          },
-        },
-      ]
-    );
-  };
-
   const handleDeleteClient = (client: Client) => {
     Alert.alert(
       'Delete Client',
-      `Are you sure you want to delete ${client.name}?`,
+      `Are you sure you want to delete "${client.name}"?`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -93,22 +75,14 @@ export const ClientsScreen: React.FC = () => {
           style: 'destructive',
           onPress: async () => {
             try {
-              setLoading(true);
-              const success = await ClientService.deleteClient(client.id);
-              if (success) {
-                setClients(prev => prev.filter(c => c.id !== client.id));
-                Alert.alert('Success', 'Client deleted successfully.');
-              } else {
-                Alert.alert('Error', 'Client not found.');
-              }
+              await ClientService.deleteClient(client.id);
+              await loadClients();
             } catch (error) {
               console.error('Error deleting client:', error);
               Alert.alert(
                 'Error',
                 'Failed to delete client. Please try again.'
               );
-            } finally {
-              setLoading(false);
             }
           },
         },
@@ -116,38 +90,29 @@ export const ClientsScreen: React.FC = () => {
     );
   };
 
-  const handleFormSubmit = async (
-    clientData: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>
-  ) => {
+  const handleClientPress = (client: Client) => {
+    // Handle client selection/navigation
+    console.log('Selected client:', client);
+  };
+
+  const handleViewClientDetails = (client: Client) => {
+    // Handle viewing client details
+    console.log('View client details:', client);
+  };
+
+  const handleFormSubmit = async (clientData: any) => {
     try {
-      setLoading(true);
-
       if (editingClient) {
-        // Update existing client
-        const updatedClient = await ClientService.updateClient(
-          editingClient.id,
-          clientData
-        );
-        if (updatedClient) {
-          setClients(prev =>
-            prev.map(c => (c.id === editingClient.id ? updatedClient : c))
-          );
-          Alert.alert('Success', 'Client updated successfully.');
-        }
+        await ClientService.updateClient(editingClient.id, clientData);
       } else {
-        // Add new client
-        const newClient = await ClientService.addClient(clientData);
-        setClients(prev => [newClient, ...prev]);
-        Alert.alert('Success', 'Client added successfully.');
+        await ClientService.createClient(clientData);
       }
-
       setShowForm(false);
       setEditingClient(undefined);
+      await loadClients();
     } catch (error) {
       console.error('Error saving client:', error);
       Alert.alert('Error', 'Failed to save client. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -156,88 +121,114 @@ export const ClientsScreen: React.FC = () => {
     setEditingClient(undefined);
   };
 
-  const handleRefresh = async () => {
-    try {
-      setRefreshing(true);
-      const clientData = await ClientService.getAllClients();
-      setClients(clientData);
-    } catch (error) {
-      console.error('Error refreshing clients:', error);
-      Alert.alert('Error', 'Failed to refresh clients. Please try again.');
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
-  // Calculate client statistics
+  // Calculate stats
   const activeClients = clients.filter(c => c.status === 'active').length;
-  const inactiveClients = clients.filter(c => c.status === 'inactive').length;
-  const totalProjects = clients.reduce(
-    (sum, c) => sum + (c.projectCount || 0),
-    0
+  const inactiveClients = clients.length - activeClients;
+
+  // Metric Card Component
+  const MetricCard: React.FC<{
+    title: string;
+    value: string | number;
+    subtitle?: string;
+    color?: string;
+  }> = ({ title, value, subtitle, color = Colors.light.primary }) => (
+    <View style={[styles.metricCard]}>
+      <View style={styles.metricContent}>
+        <EnhancedThemedText
+          type='caption'
+          color='secondary'
+          style={styles.metricTitle}
+        >
+          {title}
+        </EnhancedThemedText>
+        <EnhancedThemedText
+          type='heading3'
+          style={[styles.metricValue, { color }]}
+        >
+          {value}
+        </EnhancedThemedText>
+        {subtitle && (
+          <EnhancedThemedText
+            type='small'
+            color='muted'
+            style={styles.metricSubtitle}
+          >
+            {subtitle}
+          </EnhancedThemedText>
+        )}
+      </View>
+    </View>
   );
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <StatusBar barStyle='dark-content' backgroundColor={backgroundColor} />
 
-      <ProfessionalHeader
-        title='Clients'
-        subtitle={`${clients.length} clients in your portfolio`}
-        rightButton={{
-          title: '+ Add Client',
-          onPress: handleAddClient,
-          variant: 'primary',
-        }}
-      />
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <EnhancedThemedText type='heading1' style={styles.title}>
+            Clients
+          </EnhancedThemedText>
+          <EnhancedThemedText
+            type='body'
+            color='secondary'
+            style={styles.subtitle}
+          >
+            Manage your client portfolio
+          </EnhancedThemedText>
+        </View>
+        <TouchableOpacity style={styles.addButton} onPress={handleAddClient}>
+          <EnhancedThemedText type='bodySemiBold' style={styles.addButtonText}>
+            + Add Client
+          </EnhancedThemedText>
+        </TouchableOpacity>
+      </View>
 
-      <View style={styles.container}>
-        {/* Client Statistics */}
-        {clients.length > 0 && (
-          <View style={styles.statsSection}>
-            <EnhancedThemedText type='heading4' style={styles.sectionTitle}>
-              Overview
-            </EnhancedThemedText>
-            <View style={styles.statsGrid}>
-              <StatCard
-                title='Active Clients'
-                value={activeClients}
-                subtitle={`${clients.length} total`}
-                color={Colors.light.success}
-              />
-              <StatCard
-                title='Total Projects'
-                value={totalProjects}
-                subtitle='Across all clients'
-                color={Colors.light.primary}
-              />
-            </View>
+      {/* Stats Overview */}
+      {clients.length > 0 && (
+        <View style={styles.statsSection}>
+          <View style={styles.statsGrid}>
+            <MetricCard
+              title='Active Clients'
+              value={activeClients}
+              subtitle={`${clients.length} total`}
+              color={Colors.light.success}
+            />
+            <MetricCard
+              title='Inactive'
+              value={inactiveClients}
+              subtitle='Need attention'
+              color={Colors.light.warning}
+            />
           </View>
-        )}
-
-        {/* Client List Header */}
-        <View style={styles.listHeader}>
-          <EnhancedThemedText type='heading4'>All Clients</EnhancedThemedText>
-          {clients.length > 0 && (
-            <EnhancedThemedText type='caption' color='secondary'>
-              {activeClients} active • {inactiveClients} inactive
-            </EnhancedThemedText>
-          )}
         </View>
+      )}
 
-        <View style={styles.listContainer}>
-          <ClientList
-            clients={clients}
-            onClientPress={handleClientPress}
-            onEditClient={handleEditClient}
-            onDeleteClient={handleDeleteClient}
-            onViewDetails={handleViewClientDetails}
-            onAddClient={handleAddClient}
-            loading={loading}
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-          />
-        </View>
+      {/* Client List */}
+      <View style={styles.content}>
+        <ClientList
+          clients={clients}
+          onClientPress={handleClientPress}
+          onEditClient={handleEditClient}
+          onDeleteClient={handleDeleteClient}
+          onViewDetails={handleViewClientDetails}
+          onAddClient={handleAddClient}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          HeaderComponent={() =>
+            clients.length > 0 ? (
+              <View style={styles.listHeader}>
+                <EnhancedThemedText type='heading4'>
+                  All Clients ({clients.length})
+                </EnhancedThemedText>
+                <EnhancedThemedText type='caption' color='secondary'>
+                  {activeClients} active • {inactiveClients} inactive
+                </EnhancedThemedText>
+              </View>
+            ) : null
+          }
+        />
       </View>
 
       {/* Client Form Modal */}
@@ -250,7 +241,6 @@ export const ClientsScreen: React.FC = () => {
           client={editingClient}
           onSubmit={handleFormSubmit}
           onCancel={handleFormCancel}
-          loading={loading}
         />
       </Modal>
     </SafeAreaView>
@@ -261,36 +251,70 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollView: {
+  header: {
+    paddingHorizontal: Spacing.screenPadding,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.lg,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  headerContent: {
     flex: 1,
+    paddingRight: Spacing.md,
+  },
+  title: {
+    marginBottom: Spacing.xs,
+  },
+  subtitle: {
+    lineHeight: 20,
+  },
+  addButton: {
+    backgroundColor: Colors.light.primary,
+    borderRadius: BorderRadius.round,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    ...Shadows.sm,
+  },
+  addButtonText: {
+    color: Colors.light.textInverse,
   },
   statsSection: {
-    paddingHorizontal: Spacing.md,
+    paddingHorizontal: Spacing.screenPadding,
     marginBottom: Spacing.lg,
-  },
-  sectionTitle: {
-    marginBottom: Spacing.md,
   },
   statsGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: Spacing.md,
+    gap: Spacing.sm,
   },
-  listSection: {
+  metricCard: {
+    backgroundColor: Colors.light.surfaceSecondary,
+    borderRadius: BorderRadius.lg,
     flex: 1,
-    paddingHorizontal: Spacing.md,
+    ...Shadows.sm,
+  },
+  metricContent: {
+    padding: Spacing.cardPadding,
+    minHeight: 70,
+    justifyContent: 'center',
+  },
+  metricTitle: {
+    marginBottom: Spacing.xs,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  metricValue: {
+    marginBottom: Spacing.xs / 2,
+  },
+  metricSubtitle: {
+    lineHeight: 14,
+  },
+  content: {
+    flex: 1,
   },
   listHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.md,
-    paddingHorizontal: Spacing.md,
-  },
-  listContainer: {
-    flex: 1,
-  },
-  bottomSpacer: {
-    height: Spacing.xl,
+    paddingHorizontal: Spacing.screenPadding,
+    paddingBottom: Spacing.md,
+    gap: Spacing.xs / 2,
   },
 });

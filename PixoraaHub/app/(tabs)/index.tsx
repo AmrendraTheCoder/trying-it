@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   RefreshControl,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -20,23 +21,17 @@ import {
   TimeTrackingService,
 } from '../../src/services';
 import { Client, Project, Task, TimeEntry } from '../../src/types';
-import {
-  ProfessionalCard,
-  StatCard,
-  ProfessionalHeader,
-  ActionButton,
-  EnhancedThemedText,
-} from '../../components/ui';
+import { ProfessionalCard, EnhancedThemedText } from '../../components/ui';
 import {
   Colors,
   Spacing,
   Typography,
   BorderRadius,
+  Shadows,
 } from '../../constants/Colors';
 import { useThemeColor } from '../../hooks/useThemeColor';
 
 const { width } = Dimensions.get('window');
-const cardWidth = (width - Spacing.md * 3) / 2;
 
 interface DashboardStats {
   totalClients: number;
@@ -80,10 +75,6 @@ export default function DashboardTab() {
   const [refreshing, setRefreshing] = useState(false);
 
   const backgroundColor = useThemeColor({}, 'background');
-  const surfaceColor = useThemeColor(
-    { light: Colors.light.surface, dark: Colors.dark.surface },
-    'background'
-  );
 
   // Reload data when tab is focused
   useFocusEffect(
@@ -219,43 +210,70 @@ export default function DashboardTab() {
     }).format(amount);
   };
 
-  const QuickActionCard: React.FC<{
+  // Clean Card Component for mobile
+  const MetricCard: React.FC<{
     title: string;
-    description: string;
-    onPress: () => void;
+    value: string | number;
+    subtitle?: string;
     color?: string;
-    icon?: string;
-  }> = ({
-    title,
-    description,
-    onPress,
-    color = Colors.light.primary,
-    icon = '→',
-  }) => (
-    <ProfessionalCard
+    onPress?: () => void;
+  }> = ({ title, value, subtitle, color = Colors.light.primary, onPress }) => (
+    <TouchableOpacity
+      style={[styles.metricCard, onPress && styles.metricCardTouchable]}
       onPress={onPress}
-      style={[styles.quickActionCard, { width: cardWidth }]}
+      disabled={!onPress}
     >
-      <View style={styles.quickActionContent}>
-        <View
-          style={[styles.quickActionIcon, { backgroundColor: color + '15' }]}
-        >
-          <EnhancedThemedText type='heading3' style={{ color }}>
-            {icon}
-          </EnhancedThemedText>
-        </View>
-        <EnhancedThemedText type='bodyMedium' style={styles.quickActionTitle}>
-          {title}
-        </EnhancedThemedText>
+      <View style={styles.metricContent}>
         <EnhancedThemedText
           type='caption'
           color='secondary'
-          style={styles.quickActionDescription}
+          style={styles.metricTitle}
         >
-          {description}
+          {title}
+        </EnhancedThemedText>
+        <EnhancedThemedText
+          type='heading2'
+          style={[styles.metricValue, { color }]}
+        >
+          {value}
+        </EnhancedThemedText>
+        {subtitle && (
+          <EnhancedThemedText
+            type='small'
+            color='muted'
+            style={styles.metricSubtitle}
+          >
+            {subtitle}
+          </EnhancedThemedText>
+        )}
+      </View>
+    </TouchableOpacity>
+  );
+
+  // Quick Action Button Component
+  const QuickAction: React.FC<{
+    title: string;
+    icon: string;
+    color: string;
+    onPress: () => void;
+  }> = ({ title, icon, color, onPress }) => (
+    <TouchableOpacity
+      style={[styles.quickAction, { borderColor: color }]}
+      onPress={onPress}
+    >
+      <View style={[styles.quickActionIcon, { backgroundColor: color }]}>
+        <EnhancedThemedText type='heading3' style={styles.quickActionEmoji}>
+          {icon}
         </EnhancedThemedText>
       </View>
-    </ProfessionalCard>
+      <EnhancedThemedText
+        type='caption'
+        color='secondary'
+        style={styles.quickActionTitle}
+      >
+        {title}
+      </EnhancedThemedText>
+    </TouchableOpacity>
   );
 
   if (loading) {
@@ -280,13 +298,9 @@ export default function DashboardTab() {
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <StatusBar barStyle='dark-content' backgroundColor={backgroundColor} />
 
-      <ProfessionalHeader
-        title='Dashboard'
-        subtitle='Overview of your business'
-      />
-
       <ScrollView
         style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -297,71 +311,67 @@ export default function DashboardTab() {
           />
         }
       >
-        {/* Business Overview */}
-        <View style={styles.section}>
-          <EnhancedThemedText type='heading4' style={styles.sectionTitle}>
-            Business Overview
+        {/* Header */}
+        <View style={styles.header}>
+          <EnhancedThemedText type='heading1' style={styles.title}>
+            Dashboard
           </EnhancedThemedText>
-          <View style={styles.statsGrid}>
-            <StatCard
-              title='Total Revenue'
-              value={formatCurrency(stats.totalRevenue)}
-              subtitle={`${stats.totalProjects} projects`}
-              color={Colors.light.success}
-              onPress={() => router.push('/projects')}
-            />
-            <StatCard
-              title='Active Clients'
-              value={stats.activeClients}
-              subtitle={`${stats.totalClients} total`}
-              color={Colors.light.primary}
-              onPress={() => router.push('/clients')}
-            />
-          </View>
+          <EnhancedThemedText
+            type='body'
+            color='secondary'
+            style={styles.subtitle}
+          >
+            Welcome back! Here's your business overview.
+          </EnhancedThemedText>
         </View>
 
-        {/* Project Stats */}
+        {/* Main Metrics Grid */}
+        <View style={styles.metricsGrid}>
+          <MetricCard
+            title='Total Revenue'
+            value={formatCurrency(stats.totalRevenue)}
+            subtitle={`${stats.totalProjects} projects`}
+            color={Colors.light.success}
+            onPress={() => router.push('/(tabs)/projects')}
+          />
+          <MetricCard
+            title='Active Clients'
+            value={stats.activeClients}
+            subtitle={`${stats.totalClients} total`}
+            color={Colors.light.primary}
+            onPress={() => router.push('/(tabs)/clients')}
+          />
+          <MetricCard
+            title='Pending Tasks'
+            value={stats.pendingTasks}
+            subtitle={`${stats.totalTasks} total`}
+            color={Colors.light.warning}
+            onPress={() => router.push('/(tabs)/tasks')}
+          />
+          <MetricCard
+            title='Overdue'
+            value={stats.overdueTasks}
+            subtitle='Need attention'
+            color={Colors.light.error}
+            onPress={() => router.push('/(tabs)/tasks')}
+          />
+        </View>
+
+        {/* Project Status */}
         <View style={styles.section}>
           <EnhancedThemedText type='heading4' style={styles.sectionTitle}>
             Project Status
           </EnhancedThemedText>
-          <View style={styles.statsGrid}>
-            <StatCard
-              title='Active Projects'
+          <View style={styles.statusRow}>
+            <MetricCard
+              title='Active'
               value={stats.activeProjects}
-              subtitle='In progress'
               color={Colors.light.info}
-              onPress={() => router.push('/projects')}
             />
-            <StatCard
+            <MetricCard
               title='Completed'
               value={stats.completedProjects}
-              subtitle='This month'
               color={Colors.light.success}
-              onPress={() => router.push('/projects')}
-            />
-          </View>
-        </View>
-
-        {/* Task Management */}
-        <View style={styles.section}>
-          <EnhancedThemedText type='heading4' style={styles.sectionTitle}>
-            Task Management
-          </EnhancedThemedText>
-          <View style={styles.statsGrid}>
-            <StatCard
-              title='Pending Tasks'
-              value={stats.pendingTasks}
-              subtitle={`${stats.totalTasks} total`}
-              color={Colors.light.warning}
-              onPress={() => router.push('/tasks')}
-            />
-            <StatCard
-              title='Overdue'
-              value={stats.overdueTasks}
-              subtitle='Need attention'
-              color={Colors.light.error}
-              onPress={() => router.push('/tasks')}
             />
           </View>
         </View>
@@ -371,15 +381,15 @@ export default function DashboardTab() {
           <EnhancedThemedText type='heading4' style={styles.sectionTitle}>
             Time & Billing
           </EnhancedThemedText>
-          <View style={styles.statsGrid}>
-            <StatCard
+          <View style={styles.statusRow}>
+            <MetricCard
               title='Billable Hours'
               value={`${stats.billableHours}h`}
               subtitle={`${stats.totalHoursLogged}h total`}
               color={Colors.light.accent}
             />
-            <StatCard
-              title='Time Revenue'
+            <MetricCard
+              title='Revenue'
               value={formatCurrency(stats.timeRevenue)}
               subtitle={`${stats.totalTimeEntries} entries`}
               color={Colors.light.success}
@@ -393,35 +403,31 @@ export default function DashboardTab() {
             Quick Actions
           </EnhancedThemedText>
           <View style={styles.quickActionsGrid}>
-            <QuickActionCard
+            <QuickAction
               title='New Client'
-              description='Add a new client'
               icon='👥'
               color={Colors.light.primary}
-              onPress={() => router.push('/clients')}
+              onPress={() => router.push('/(tabs)/clients')}
             />
-            <QuickActionCard
+            <QuickAction
               title='New Project'
-              description='Start a project'
               icon='📁'
               color={Colors.light.secondary}
-              onPress={() => router.push('/projects')}
+              onPress={() => router.push('/(tabs)/projects')}
             />
-            <QuickActionCard
+            <QuickAction
               title='Add Task'
-              description='Create a task'
               icon='✅'
               color={Colors.light.accent}
-              onPress={() => router.push('/tasks')}
+              onPress={() => router.push('/(tabs)/tasks')}
             />
-            <QuickActionCard
+            <QuickAction
               title='Analytics'
-              description='View reports'
               icon='📊'
               color={Colors.light.warning}
-              onPress={() => {
-                Alert.alert('Analytics', 'Advanced analytics coming soon!');
-              }}
+              onPress={() =>
+                Alert.alert('Analytics', 'Advanced analytics coming soon!')
+              }
             />
           </View>
         </View>
@@ -439,6 +445,9 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  scrollContent: {
+    paddingBottom: Spacing.xl,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -447,44 +456,91 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: Spacing.md,
   },
+  header: {
+    paddingHorizontal: Spacing.screenPadding,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.lg,
+  },
+  title: {
+    marginBottom: Spacing.xs,
+  },
+  subtitle: {
+    lineHeight: 20,
+  },
+  metricsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: Spacing.screenPadding,
+    marginBottom: Spacing.lg,
+    gap: Spacing.sm,
+  },
+  metricCard: {
+    backgroundColor: Colors.light.surfaceSecondary,
+    borderRadius: BorderRadius.lg,
+    width: (width - Spacing.screenPadding * 2 - Spacing.sm) / 2,
+    ...Shadows.sm,
+  },
+  metricCardTouchable: {
+    // Add subtle press effect for touchable cards
+  },
+  metricContent: {
+    padding: Spacing.cardPadding,
+    minHeight: 80,
+    justifyContent: 'center',
+  },
+  metricTitle: {
+    marginBottom: Spacing.xs,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  metricValue: {
+    marginBottom: Spacing.xs / 2,
+  },
+  metricSubtitle: {
+    lineHeight: 14,
+  },
   section: {
-    paddingHorizontal: Spacing.md,
+    paddingHorizontal: Spacing.screenPadding,
     marginBottom: Spacing.lg,
   },
   sectionTitle: {
     marginBottom: Spacing.md,
   },
-  statsGrid: {
+  statusRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: Spacing.md,
+    gap: Spacing.sm,
   },
   quickActionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
     gap: Spacing.md,
+    justifyContent: 'space-between',
   },
-  quickActionCard: {
-    marginBottom: 0,
-  },
-  quickActionContent: {
+  quickAction: {
+    backgroundColor: Colors.light.surfaceSecondary,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.cardPadding,
     alignItems: 'center',
+    width: (width - Spacing.screenPadding * 2 - Spacing.md) / 2,
+    borderWidth: 1,
+    borderColor: Colors.light.border,
+    ...Shadows.sm,
   },
   quickActionIcon: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: Spacing.sm,
+  },
+  quickActionEmoji: {
+    color: Colors.light.textInverse,
   },
   quickActionTitle: {
     textAlign: 'center',
-    marginBottom: Spacing.xs / 2,
-  },
-  quickActionDescription: {
-    textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   bottomSpacer: {
     height: Spacing.xl,
