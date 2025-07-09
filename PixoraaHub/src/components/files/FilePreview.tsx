@@ -18,6 +18,7 @@ interface FilePreviewProps {
   attachment: FileAttachment;
   onDelete?: (id: string) => void;
   onEdit?: (attachment: FileAttachment) => void;
+  onView?: (id: string) => void;
   showActions?: boolean;
   compact?: boolean;
   style?: any;
@@ -29,6 +30,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
   attachment,
   onDelete,
   onEdit,
+  onView,
   showActions = true,
   compact = false,
   style,
@@ -41,6 +43,11 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
   const isDocument = fileService.isDocumentFile(attachment.mimeType);
 
   const handlePreview = async () => {
+    if (onView) {
+      onView(attachment.id);
+      return;
+    }
+
     if (isImage) {
       const uri = await fileService.getFileUri(attachment.id);
       if (uri) {

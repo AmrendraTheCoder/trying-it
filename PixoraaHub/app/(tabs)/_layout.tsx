@@ -15,6 +15,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
@@ -22,17 +23,50 @@ export default function TabLayout() {
           ios: {
             // Use a transparent background on iOS to show the blur effect
             position: 'absolute',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            borderTopWidth: 0,
+            elevation: 0,
+            shadowColor: Colors[colorScheme ?? 'light'].shadowColor,
+            shadowOffset: { width: 0, height: -3 },
+            shadowOpacity: 0.1,
+            shadowRadius: 12,
+            paddingBottom: 5,
+            height: 84,
           },
-          default: {},
+          default: {
+            backgroundColor: Colors[colorScheme ?? 'light'].background,
+            borderTopWidth: 1,
+            borderTopColor: Colors[colorScheme ?? 'light'].border,
+            elevation: 8,
+            shadowColor: Colors[colorScheme ?? 'light'].shadowColor,
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            paddingBottom: 8,
+            height: 70,
+          },
         }),
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+          marginTop: 4,
+        },
+        tabBarIconStyle: {
+          marginTop: 6,
+        },
       }}
     >
       <Tabs.Screen
         name='index'
         options={{
           title: 'Dashboard',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name='house.fill' color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol
+              size={28}
+              name={focused ? 'chart.bar.fill' : 'chart.bar'}
+              color={color}
+              style={{ marginBottom: -3 }}
+            />
           ),
         }}
       />
@@ -40,8 +74,13 @@ export default function TabLayout() {
         name='clients'
         options={{
           title: 'Clients',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name='person.2.fill' color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol
+              size={28}
+              name={focused ? 'person.2.fill' : 'person.2'}
+              color={color}
+              style={{ marginBottom: -3 }}
+            />
           ),
         }}
       />
@@ -49,8 +88,13 @@ export default function TabLayout() {
         name='projects'
         options={{
           title: 'Projects',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name='folder.fill' color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol
+              size={28}
+              name={focused ? 'folder.fill' : 'folder'}
+              color={color}
+              style={{ marginBottom: -3 }}
+            />
           ),
         }}
       />
@@ -58,8 +102,13 @@ export default function TabLayout() {
         name='tasks'
         options={{
           title: 'Tasks',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name='checklist' color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol
+              size={28}
+              name={focused ? 'checklist' : 'list.bullet'}
+              color={color}
+              style={{ marginBottom: -3 }}
+            />
           ),
         }}
       />

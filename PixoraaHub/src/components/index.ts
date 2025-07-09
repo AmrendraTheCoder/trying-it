@@ -16,5 +16,8 @@ export * from './charts';
 // File components
 export * from './files';
 
+// Notification components
+export * from './notifications';
+
 // Common/UI components (placeholder for future implementation)
 // export * from './common';

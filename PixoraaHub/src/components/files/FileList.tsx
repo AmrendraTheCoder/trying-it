@@ -11,6 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { FilePreview } from './FilePreview';
 import { FilePicker } from './FilePicker';
+import { FileViewer } from './FileViewer';
 import { fileService } from '../../services/fileService';
 import { FileAttachment, AttachmentType, FilePickerOptions } from '../../types';
 
@@ -41,6 +42,8 @@ export const FileList: React.FC<FileListProps> = ({
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showAllFiles, setShowAllFiles] = useState(false);
+  const [showFileViewer, setShowFileViewer] = useState(false);
+  const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
 
   useEffect(() => {
     loadAttachments();
@@ -125,6 +128,38 @@ export const FileList: React.FC<FileListProps> = ({
 
   const handleUploadError = (error: string) => {
     Alert.alert('Upload Error', error);
+  };
+
+  const handleFileView = (fileId: string) => {
+    setSelectedFileId(fileId);
+    setShowFileViewer(true);
+  };
+
+  const handleFileViewerClose = () => {
+    setShowFileViewer(false);
+    setSelectedFileId(null);
+  };
+
+  const handleFileViewerEdit = async (
+    fileId: string,
+    updates: { fileName?: string; description?: string }
+  ) => {
+    const updatedAttachments = attachments.map(file =>
+      file.id === fileId ? { ...file, ...updates } : file
+    );
+    setAttachments(updatedAttachments);
+    onFilesChange?.(updatedAttachments);
+  };
+
+  const handleFileViewerDelete = async (fileId: string) => {
+    const updatedAttachments = attachments.filter(file => file.id !== fileId);
+    setAttachments(updatedAttachments);
+    onFilesChange?.(updatedAttachments);
+  };
+
+  const handleFileViewerShare = (fileId: string) => {
+    // File share action completed
+    console.log('File shared:', fileId);
   };
 
   const displayedFiles = showAllFiles ? attachments : attachments.slice(0, 5);
@@ -242,6 +277,7 @@ export const FileList: React.FC<FileListProps> = ({
                   attachment={attachment}
                   onDelete={handleFileDelete}
                   onEdit={handleFileEdit}
+                  onView={handleFileView}
                   compact={true}
                   showActions={false}
                 />
@@ -271,6 +307,7 @@ export const FileList: React.FC<FileListProps> = ({
                   attachment={attachment}
                   onDelete={handleFileDelete}
                   onEdit={handleFileEdit}
+                  onView={handleFileView}
                   showActions={true}
                 />
               ))}
@@ -296,6 +333,16 @@ export const FileList: React.FC<FileListProps> = ({
           </View>
         )
       )}
+
+      {/* File Viewer Modal */}
+      <FileViewer
+        visible={showFileViewer}
+        fileId={selectedFileId}
+        onClose={handleFileViewerClose}
+        onEdit={handleFileViewerEdit}
+        onDelete={handleFileViewerDelete}
+        onShare={handleFileViewerShare}
+      />
     </View>
   );
 };

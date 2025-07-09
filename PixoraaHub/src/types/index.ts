@@ -615,3 +615,63 @@ export interface AttachmentStats {
   totalSize: number;
   filesByType: Record<AttachmentType, number>;
 }
+
+// Notification Types
+export type NotificationType =
+  | 'task_due'
+  | 'task_assigned'
+  | 'task_completed'
+  | 'project_update'
+  | 'client_message'
+  | 'system_update'
+  | 'reminder'
+  | 'time_tracking';
+
+export type NotificationPriority = 'low' | 'normal' | 'high' | 'urgent';
+
+export interface AppNotification {
+  id: string;
+  title: string;
+  body: string;
+  type: NotificationType;
+  priority: NotificationPriority;
+  data?: Record<string, any>;
+  entityId?: string; // Related task, project, or client ID
+  entityType?: 'task' | 'project' | 'client';
+  read: boolean;
+  createdAt: string;
+  scheduledFor?: string; // For scheduled notifications
+  recurring?: {
+    frequency: 'daily' | 'weekly' | 'monthly';
+    interval: number;
+    endDate?: string;
+  };
+}
+
+export interface NotificationSettings {
+  enabled: boolean;
+  pushEnabled: boolean;
+  soundEnabled: boolean;
+  vibrationEnabled: boolean;
+  quietHours: {
+    enabled: boolean;
+    startTime: string; // HH:MM format
+    endTime: string; // HH:MM format
+  };
+  categories: {
+    [K in NotificationType]: {
+      enabled: boolean;
+      pushEnabled: boolean;
+      soundEnabled: boolean;
+    };
+  };
+}
+
+export interface NotificationStats {
+  total: number;
+  unread: number;
+  byType: Record<NotificationType, number>;
+  byPriority: Record<NotificationPriority, number>;
+  todayCount: number;
+  weekCount: number;
+}

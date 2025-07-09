@@ -3,15 +3,24 @@ import {
   View,
   StyleSheet,
   Modal,
-  TouchableOpacity,
-  Text,
   Alert,
   StatusBar,
+  RefreshControl,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ProjectList, ProjectForm } from '../../components';
 import { Project, Client } from '../../types';
 import { ProjectService, ClientService } from '../../services';
+import {
+  ProfessionalHeader,
+  ActionButton,
+  EnhancedThemedText,
+  StatCard,
+  StatusBadge,
+} from '../../../components/ui';
+import { Colors, Spacing } from '../../../constants/Colors';
+import { useThemeColor } from '../../../hooks/useThemeColor';
 
 export const ProjectsScreen: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -20,6 +29,8 @@ export const ProjectsScreen: React.FC = () => {
   const [editingProject, setEditingProject] = useState<Project | undefined>();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  const backgroundColor = useThemeColor({}, 'background');
 
   // Load initial data when component mounts
   useEffect(() => {
@@ -210,10 +221,12 @@ export const ProjectsScreen: React.FC = () => {
   const handleRefresh = async () => {
     try {
       setRefreshing(true);
+
       const [projectData, clientData] = await Promise.all([
         ProjectService.getAllProjects(),
         ClientService.getAllClients(),
       ]);
+
       setProjects(projectData);
       setClients(clientData);
     } catch (error) {
@@ -224,73 +237,135 @@ export const ProjectsScreen: React.FC = () => {
     }
   };
 
-  const getProjectStats = () => {
-    const activeProjects = projects.filter(p => p.status === 'active').length;
-    const completedProjects = projects.filter(
-      p => p.status === 'completed'
-    ).length;
-    const totalBudget = projects.reduce((sum, p) => sum + (p.budget || 0), 0);
-    const totalSpent = projects.reduce(
-      (sum, p) => sum + (p.totalSpent || 0),
-      0
-    );
+  // Calculate project statistics
+  const activeProjects = projects.filter(p => p.status === 'active').length;
+  const completedProjects = projects.filter(p => p.status === 'completed').length;
+  const onHoldProjects = projects.filter(p => p.status === 'on_hold').length;
+  const totalBudget = projects.reduce((sum, p) => sum + (p.budget || 0), 0);
+  const totalSpent = projects.reduce((sum, p) => sum + (p.totalSpent || 0), 0);
 
-    return {
-      total: projects.length,
-      active: activeProjects,
-      completed: completedProjects,
-      totalBudget,
-      totalSpent,
-    };
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
 
-  const stats = getProjectStats();
-
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle='dark-content' />
-      {/* Header with Stats and Add Button */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Projects</Text>
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{stats.total}</Text>
-              <Text style={styles.statLabel}>Total</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor }]}>
+      <StatusBar barStyle="dark-content" backgroundColor={backgroundColor} />
+      
+      <ProfessionalHeader
+        title="Projects"
+        subtitle={`${projects.length} projects in your portfolio`}
+        rightButton={{
+          title: '+ New Project',
+          onPress: handleAddProject,
+          variant: 'primary',
+        }}
+      />
+
+      <View style={styles.container}>
+        {/* Project Statistics */}
+        {projects.length > 0 && (
+          <View style={styles.statsSection}>
+            <EnhancedThemedText type="heading4" style={styles.sectionTitle}>
+              Overview
+            </EnhancedThemedText>
+            <View style={styles.statsGrid}>
+              <StatCard
+                title="Active Projects"
+                value={activeProjects}
+                subtitle={`${projects.length} total`}
+                color={Colors.light.primary}
+              />
+              <StatCard
+                title="Total Budget"
+                value={formatCurrency(totalBudget)}
+                subtitle={`${formatCurrency(totalSpent)} spent`}
+                color={Colors.light.success}
+              />
             </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{stats.active}</Text>
-              <Text style={styles.statLabel}>Active</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{stats.completed}</Text>
-              <Text style={styles.statLabel}>Done</Text>
+            <View style={styles.statsGrid}>
+              <StatCard
+                title="Completed"
+                value={completedProjects}
+                subtitle="This period"
+                color={Colors.light.accent}
+              />
+              <StatCard
+                title="On Hold"
+                value={onHoldProjects}
+                subtitle="Requires attention"
+                color={Colors.light.warning}
+              />
             </View>
           </View>
-        </View>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddProject}>
-          <Text style={styles.addButtonText}>+ Add Project</Text>
-        </TouchableOpacity>
-      </View>
+        )}
 
-      {/* Project List */}
-      <ProjectList
-        projects={projects}
-        onProjectPress={handleProjectPress}
-        onEditProject={handleEditProject}
-        onDeleteProject={handleDeleteProject}
-        onViewDetails={handleViewProjectDetails}
-        onAddProject={handleAddProject}
-        loading={loading}
-        refreshing={refreshing}
-        onRefresh={handleRefresh}
-      />
+        {/* Project Status Summary */}
+        {projects.length > 0 && (
+          <View style={styles.statusSection}>
+            <EnhancedThemedText type="heading4" style={styles.sectionTitle}>
+              Status Summary
+            </EnhancedThemedText>
+            <View style={styles.statusBadgesContainer}>
+              <View style={styles.statusBadgeItem}>
+                <StatusBadge status="active" />
+                <EnhancedThemedText type="caption" color="secondary" style={styles.statusCount}>
+                  {activeProjects}
+                </EnhancedThemedText>
+              </View>
+              <View style={styles.statusBadgeItem}>
+                <StatusBadge status="completed" />
+                <EnhancedThemedText type="caption" color="secondary" style={styles.statusCount}>
+                  {completedProjects}
+                </EnhancedThemedText>
+              </View>
+              <View style={styles.statusBadgeItem}>
+                <StatusBadge status="on_hold" />
+                <EnhancedThemedText type="caption" color="secondary" style={styles.statusCount}>
+                  {onHoldProjects}
+                </EnhancedThemedText>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* Project List Header */}
+        <View style={styles.listHeader}>
+          <EnhancedThemedText type="heading4">
+            All Projects
+          </EnhancedThemedText>
+          {projects.length > 0 && (
+            <EnhancedThemedText type="caption" color="secondary">
+              {activeProjects} active • {completedProjects} completed
+            </EnhancedThemedText>
+          )}
+        </View>
+        
+        <View style={styles.listContainer}>
+          <ProjectList
+            projects={projects}
+            onProjectPress={handleProjectPress}
+            onEditProject={handleEditProject}
+            onDeleteProject={handleDeleteProject}
+            onViewDetails={handleViewProjectDetails}
+            onAddProject={handleAddProject}
+            loading={loading}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+          />
+        </View>
+      </View>
 
       {/* Project Form Modal */}
       <Modal
         visible={showForm}
-        animationType='slide'
-        presentationStyle='pageSheet'
+        animationType="slide"
+        presentationStyle="pageSheet"
       >
         <ProjectForm
           project={editingProject}
@@ -307,52 +382,53 @@ export const ProjectsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
-  header: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+  scrollView: {
+    flex: 1,
   },
-  headerContent: {
-    marginBottom: 12,
+  statsSection: {
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.lg,
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 12,
+  sectionTitle: {
+    marginBottom: Spacing.md,
   },
-  statsContainer: {
+  statsGrid: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
+    gap: Spacing.md,
+    marginBottom: Spacing.md,
   },
-  statItem: {
+  statusSection: {
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
+  statusBadgesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
-    marginRight: 24,
   },
-  statNumber: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#007AFF',
+  statusBadgeItem: {
+    alignItems: 'center',
   },
-  statLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 2,
+  statusCount: {
+    marginTop: Spacing.xs / 2,
   },
-  addButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    alignSelf: 'flex-end',
+  listSection: {
+    flex: 1,
+    paddingHorizontal: Spacing.md,
   },
-  addButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
+  listHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  bottomSpacer: {
+    height: Spacing.xl,
+  },
+  listContainer: {
+    flex: 1,
+    paddingHorizontal: Spacing.md,
   },
 });

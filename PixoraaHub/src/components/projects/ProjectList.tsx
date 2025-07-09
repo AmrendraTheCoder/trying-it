@@ -17,6 +17,7 @@ interface ProjectListProps {
   onProjectPress: (project: Project) => void;
   onEditProject?: (project: Project) => void;
   onDeleteProject?: (project: Project) => void;
+  onViewDetails?: (project: Project) => void;
   onAddProject?: () => void;
   loading?: boolean;
   refreshing?: boolean;
@@ -37,6 +38,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
   onProjectPress,
   onEditProject,
   onDeleteProject,
+  onViewDetails,
   onAddProject,
   loading: _loading,
   refreshing = false,
@@ -168,6 +170,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
       onPress={onProjectPress}
       onEdit={onEditProject}
       onDelete={handleDeleteProject}
+      onViewDetails={onViewDetails}
       showClient={showClient}
     />
   );

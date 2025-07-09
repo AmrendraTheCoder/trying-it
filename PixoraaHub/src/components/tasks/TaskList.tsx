@@ -18,6 +18,7 @@ interface TaskListProps {
   onTaskEdit?: (task: Task) => void;
   onTaskDelete?: (taskId: string) => void;
   onTaskStatusChange?: (taskId: string, status: TaskStatus) => void;
+  onViewDetails?: (task: Task) => void;
   refreshing?: boolean;
   onRefresh?: () => void;
   showProjectName?: boolean;
@@ -33,6 +34,7 @@ export const TaskList: React.FC<TaskListProps> = ({
   onTaskEdit,
   onTaskDelete,
   onTaskStatusChange,
+  onViewDetails,
   refreshing = false,
   onRefresh,
   showProjectName = true,
@@ -344,6 +346,7 @@ export const TaskList: React.FC<TaskListProps> = ({
             onEdit={onTaskEdit}
             onDelete={onTaskDelete}
             onStatusChange={onTaskStatusChange}
+            onViewDetails={onViewDetails}
             projectName={
               showProjectName ? getProjectName(item.projectId) : undefined
             }
