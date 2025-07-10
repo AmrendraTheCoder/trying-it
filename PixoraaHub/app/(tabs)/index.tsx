@@ -21,7 +21,7 @@ import {
   TimeTrackingService,
 } from '../../src/services';
 import { Client, Project, Task, TimeEntry } from '../../src/types';
-import { ProfessionalCard, EnhancedThemedText } from '../../components/ui';
+import { EnhancedThemedText } from '../../components/ui';
 import {
   Colors,
   Spacing,
