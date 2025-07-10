@@ -6,7 +6,7 @@ export class StorageService {
       const jsonValue = JSON.stringify(value);
       await AsyncStorage.setItem(key, jsonValue);
     } catch (error) {
-      console.error(`Error storing data for key ${key}:`, error);
+      Logger.error(`Error storing data for key ${key}:`, error);
       throw new Error(`Failed to store data: ${error}`);
     }
   }
@@ -16,7 +16,7 @@ export class StorageService {
       const jsonValue = await AsyncStorage.getItem(key);
       return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch (error) {
-      console.error(`Error retrieving data for key ${key}:`, error);
+      Logger.error(`Error retrieving data for key ${key}:`, error);
       return null;
     }
   }
@@ -25,7 +25,7 @@ export class StorageService {
     try {
       await AsyncStorage.removeItem(key);
     } catch (error) {
-      console.error(`Error removing data for key ${key}:`, error);
+      Logger.error(`Error removing data for key ${key}:`, error);
       throw new Error(`Failed to remove data: ${error}`);
     }
   }
@@ -34,7 +34,7 @@ export class StorageService {
     try {
       await AsyncStorage.clear();
     } catch (error) {
-      console.error('Error clearing storage:', error);
+      Logger.error('Error clearing storage:', error);
       throw new Error('Failed to clear storage');
     }
   }
@@ -43,7 +43,7 @@ export class StorageService {
     try {
       return await AsyncStorage.getAllKeys();
     } catch (error) {
-      console.error('Error getting all keys:', error);
+      Logger.error('Error getting all keys:', error);
       return [];
     }
   }

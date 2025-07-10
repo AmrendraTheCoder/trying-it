@@ -25,11 +25,12 @@ import { EnhancedThemedText } from '../../components/ui';
 import {
   Colors,
   Spacing,
-  Typography,
+  // Typography,
   BorderRadius,
   Shadows,
 } from '../../constants/Colors';
 import { useThemeColor } from '../../hooks/useThemeColor';
+import { Logger } from '@/src/utils/logger';
 
 const { width } = Dimensions.get('window');
 
@@ -188,7 +189,7 @@ export default function DashboardTab() {
         timeRevenue,
       });
     } catch (error) {
-      console.error('Error loading dashboard data:', error);
+      Logger.error('Error loading dashboard data:', error);
       Alert.alert('Error', 'Failed to load dashboard data. Please try again.');
     } finally {
       setLoading(false);
@@ -321,7 +322,7 @@ export default function DashboardTab() {
             color='secondary'
             style={styles.subtitle}
           >
-            Welcome back! Here's your business overview.
+            Welcome back! Heres your business overview.
           </EnhancedThemedText>
         </View>
 

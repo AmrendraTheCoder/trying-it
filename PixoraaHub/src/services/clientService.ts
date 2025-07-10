@@ -1,3 +1,4 @@
+import { Logger } from '../utils/logger';
 import { Client } from '../types';
 import { StorageService } from './storage';
 
@@ -66,7 +67,7 @@ export class ClientService {
         await StorageService.setItem(CLIENTS_KEY, defaultClients);
       }
     } catch (error) {
-      console.error('Error initializing clients:', error);
+      Logger.error('Error initializing clients:', error);
       throw error;
     }
   }
@@ -77,7 +78,7 @@ export class ClientService {
       const clients = await StorageService.getItem<Client[]>(CLIENTS_KEY);
       return clients || [];
     } catch (error) {
-      console.error('Error getting clients:', error);
+      Logger.error('Error getting clients:', error);
       return [];
     }
   }
@@ -88,7 +89,7 @@ export class ClientService {
       const clients = await this.getAllClients();
       return clients.find(client => client.id === id) || null;
     } catch (error) {
-      console.error('Error getting client by ID:', error);
+      Logger.error('Error getting client by ID:', error);
       return null;
     }
   }
@@ -111,7 +112,7 @@ export class ClientService {
       await StorageService.setItem(CLIENTS_KEY, updatedClients);
       return newClient;
     } catch (error) {
-      console.error('Error adding client:', error);
+      Logger.error('Error adding client:', error);
       throw error;
     }
   }
@@ -139,7 +140,7 @@ export class ClientService {
       await StorageService.setItem(CLIENTS_KEY, clients);
       return updatedClient;
     } catch (error) {
-      console.error('Error updating client:', error);
+      Logger.error('Error updating client:', error);
       throw error;
     }
   }
@@ -157,7 +158,7 @@ export class ClientService {
       await StorageService.setItem(CLIENTS_KEY, filteredClients);
       return true;
     } catch (error) {
-      console.error('Error deleting client:', error);
+      Logger.error('Error deleting client:', error);
       throw error;
     }
   }
@@ -170,7 +171,7 @@ export class ClientService {
     try {
       await this.updateClient(clientId, { projectCount });
     } catch (error) {
-      console.error('Error updating client project count:', error);
+      Logger.error('Error updating client project count:', error);
       throw error;
     }
   }
@@ -190,7 +191,7 @@ export class ClientService {
             client.company.toLowerCase().includes(lowercaseQuery))
       );
     } catch (error) {
-      console.error('Error searching clients:', error);
+      Logger.error('Error searching clients:', error);
       return [];
     }
   }
@@ -201,7 +202,7 @@ export class ClientService {
       const clients = await this.getAllClients();
       return clients.filter(client => client.status === status);
     } catch (error) {
-      console.error('Error getting clients by status:', error);
+      Logger.error('Error getting clients by status:', error);
       return [];
     }
   }

@@ -1,3 +1,4 @@
+import { Logger } from '../utils/logger';
 import {
   TimeEntry,
   ActiveTimer,
@@ -111,7 +112,7 @@ export class TimeTrackingService {
         await StorageService.setItem(TIME_SETTINGS_KEY, defaultSettings);
       }
     } catch (error) {
-      console.error('Error initializing time entries:', error);
+      Logger.error('Error initializing time entries:', error);
       throw error;
     }
   }
@@ -123,7 +124,7 @@ export class TimeTrackingService {
         await StorageService.getItem<TimeEntry[]>(TIME_ENTRIES_KEY);
       return entries || [];
     } catch (error) {
-      console.error('Error getting time entries:', error);
+      Logger.error('Error getting time entries:', error);
       return [];
     }
   }
@@ -134,7 +135,7 @@ export class TimeTrackingService {
       const allEntries = await this.getAllTimeEntries();
       return allEntries.filter(entry => entry.taskId === taskId);
     } catch (error) {
-      console.error('Error getting time entries by task:', error);
+      Logger.error('Error getting time entries by task:', error);
       return [];
     }
   }
@@ -147,7 +148,7 @@ export class TimeTrackingService {
       const allEntries = await this.getAllTimeEntries();
       return allEntries.filter(entry => entry.projectId === projectId);
     } catch (error) {
-      console.error('Error getting time entries by project:', error);
+      Logger.error('Error getting time entries by project:', error);
       return [];
     }
   }
@@ -166,7 +167,7 @@ export class TimeTrackingService {
         return entryDate >= start && entryDate <= end;
       });
     } catch (error) {
-      console.error('Error getting time entries by date range:', error);
+      Logger.error('Error getting time entries by date range:', error);
       return [];
     }
   }
@@ -200,7 +201,7 @@ export class TimeTrackingService {
       await StorageService.setItem(ACTIVE_TIMER_KEY, timer);
       return timer;
     } catch (error) {
-      console.error('Error starting timer:', error);
+      Logger.error('Error starting timer:', error);
       return null;
     }
   }
@@ -254,7 +255,7 @@ export class TimeTrackingService {
 
       return timeEntry;
     } catch (error) {
-      console.error('Error stopping timer:', error);
+      Logger.error('Error stopping timer:', error);
       return null;
     }
   }
@@ -265,7 +266,7 @@ export class TimeTrackingService {
       const timer = await StorageService.getItem<ActiveTimer>(ACTIVE_TIMER_KEY);
       return timer || null;
     } catch (error) {
-      console.error('Error getting active timer:', error);
+      Logger.error('Error getting active timer:', error);
       return null;
     }
   }
@@ -297,7 +298,7 @@ export class TimeTrackingService {
 
       return timeEntry;
     } catch (error) {
-      console.error('Error adding time entry:', error);
+      Logger.error('Error adding time entry:', error);
       throw error;
     }
   }
@@ -327,7 +328,7 @@ export class TimeTrackingService {
 
       return updatedEntry;
     } catch (error) {
-      console.error('Error updating time entry:', error);
+      Logger.error('Error updating time entry:', error);
       return null;
     }
   }
@@ -349,7 +350,7 @@ export class TimeTrackingService {
 
       return true;
     } catch (error) {
-      console.error('Error deleting time entry:', error);
+      Logger.error('Error deleting time entry:', error);
       return false;
     }
   }
@@ -366,7 +367,7 @@ export class TimeTrackingService {
 
       await TaskService.updateTask(taskId, { actualHours: totalHours });
     } catch (error) {
-      console.error('Error updating task actual hours:', error);
+      Logger.error('Error updating task actual hours:', error);
     }
   }
 
@@ -426,7 +427,7 @@ export class TimeTrackingService {
         dailyBreakdown,
       };
     } catch (error) {
-      console.error('Error getting time tracking stats:', error);
+      Logger.error('Error getting time tracking stats:', error);
       return {
         totalHours: 0,
         billableHours: 0,
@@ -447,7 +448,7 @@ export class TimeTrackingService {
         await StorageService.getItem<TimeTrackingSettings>(TIME_SETTINGS_KEY);
       return settings || defaultSettings;
     } catch (error) {
-      console.error('Error getting time tracking settings:', error);
+      Logger.error('Error getting time tracking settings:', error);
       return defaultSettings;
     }
   }
@@ -462,7 +463,7 @@ export class TimeTrackingService {
       await StorageService.setItem(TIME_SETTINGS_KEY, newSettings);
       return newSettings;
     } catch (error) {
-      console.error('Error updating time tracking settings:', error);
+      Logger.error('Error updating time tracking settings:', error);
       throw error;
     }
   }
@@ -541,7 +542,7 @@ export class TimeTrackingService {
 
       return breakdown.sort((a, b) => b.totalHours - a.totalHours);
     } catch (error) {
-      console.error('Error getting project time breakdown:', error);
+      Logger.error('Error getting project time breakdown:', error);
       return [];
     }
   }
@@ -589,7 +590,7 @@ export class TimeTrackingService {
 
       return breakdown.sort((a, b) => b.totalHours - a.totalHours);
     } catch (error) {
-      console.error('Error getting task time breakdown:', error);
+      Logger.error('Error getting task time breakdown:', error);
       return [];
     }
   }
@@ -638,7 +639,7 @@ export class TimeTrackingService {
 
       return breakdown.sort((a, b) => b.date.localeCompare(a.date));
     } catch (error) {
-      console.error('Error getting daily time breakdown:', error);
+      Logger.error('Error getting daily time breakdown:', error);
       return [];
     }
   }

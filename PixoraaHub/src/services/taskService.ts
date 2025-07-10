@@ -1,3 +1,4 @@
+import { Logger } from '../utils/logger';
 import { Task, TaskStatus, Priority } from '../types';
 import { StorageService } from './storage';
 import { ProjectService } from './projectService';
@@ -146,7 +147,7 @@ export class TaskService {
         await StorageService.setItem(TASKS_KEY, defaultTasks);
       }
     } catch (error) {
-      console.error('Error initializing tasks:', error);
+      Logger.error('Error initializing tasks:', error);
       throw error;
     }
   }
@@ -157,7 +158,7 @@ export class TaskService {
       const tasks = await StorageService.getItem<Task[]>(TASKS_KEY);
       return tasks || [];
     } catch (error) {
-      console.error('Error getting tasks:', error);
+      Logger.error('Error getting tasks:', error);
       return [];
     }
   }
@@ -168,7 +169,7 @@ export class TaskService {
       const tasks = await this.getAllTasks();
       return tasks.filter(task => task.projectId === projectId);
     } catch (error) {
-      console.error('Error getting tasks by project:', error);
+      Logger.error('Error getting tasks by project:', error);
       return [];
     }
   }
@@ -179,7 +180,7 @@ export class TaskService {
       const tasks = await this.getAllTasks();
       return tasks.find(task => task.id === taskId) || null;
     } catch (error) {
-      console.error('Error getting task by ID:', error);
+      Logger.error('Error getting task by ID:', error);
       return null;
     }
   }
@@ -210,7 +211,7 @@ export class TaskService {
 
       return newTask;
     } catch (error) {
-      console.error('Error adding task:', error);
+      Logger.error('Error adding task:', error);
       throw error;
     }
   }
@@ -225,7 +226,7 @@ export class TaskService {
       const taskIndex = tasks.findIndex(task => task.id === taskId);
 
       if (taskIndex === -1) {
-        console.error('Task not found:', taskId);
+        Logger.error('Task not found:', taskId);
         return null;
       }
 
@@ -255,7 +256,7 @@ export class TaskService {
 
       return updatedTask;
     } catch (error) {
-      console.error('Error updating task:', error);
+      Logger.error('Error updating task:', error);
       throw error;
     }
   }
@@ -267,7 +268,7 @@ export class TaskService {
       const taskIndex = tasks.findIndex(task => task.id === taskId);
 
       if (taskIndex === -1) {
-        console.error('Task not found:', taskId);
+        Logger.error('Task not found:', taskId);
         return false;
       }
 
@@ -287,7 +288,7 @@ export class TaskService {
 
       return true;
     } catch (error) {
-      console.error('Error deleting task:', error);
+      Logger.error('Error deleting task:', error);
       return false;
     }
   }
@@ -298,7 +299,7 @@ export class TaskService {
       const tasks = await this.getAllTasks();
       return tasks.filter(task => task.status === status);
     } catch (error) {
-      console.error('Error getting tasks by status:', error);
+      Logger.error('Error getting tasks by status:', error);
       return [];
     }
   }
@@ -309,7 +310,7 @@ export class TaskService {
       const tasks = await this.getAllTasks();
       return tasks.filter(task => task.assignedTo.includes(userId));
     } catch (error) {
-      console.error('Error getting tasks by assignee:', error);
+      Logger.error('Error getting tasks by assignee:', error);
       return [];
     }
   }
@@ -328,7 +329,7 @@ export class TaskService {
           task.status !== 'cancelled'
       );
     } catch (error) {
-      console.error('Error getting overdue tasks:', error);
+      Logger.error('Error getting overdue tasks:', error);
       return [];
     }
   }
@@ -349,7 +350,7 @@ export class TaskService {
         completedTasks: completedTasks,
       });
     } catch (error) {
-      console.error('Error updating project task counts:', error);
+      Logger.error('Error updating project task counts:', error);
     }
   }
 
@@ -384,7 +385,7 @@ export class TaskService {
         blocked: tasks.filter(t => t.status === 'blocked').length,
       };
     } catch (error) {
-      console.error('Error getting task stats:', error);
+      Logger.error('Error getting task stats:', error);
       return {
         total: 0,
         completed: 0,
@@ -441,7 +442,7 @@ export class TaskService {
 
       return updatedTasks;
     } catch (error) {
-      console.error('Error bulk updating task status:', error);
+      Logger.error('Error bulk updating task status:', error);
       throw error;
     }
   }

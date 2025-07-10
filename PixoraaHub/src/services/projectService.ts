@@ -1,6 +1,7 @@
 import { Project } from '../types';
 import { StorageService } from './storage';
 import { ClientService } from './clientService';
+import { Logger } from '../utils/logger';
 
 const PROJECTS_KEY = 'pixoraahub_projects';
 
@@ -9,7 +10,8 @@ const defaultProjects: Project[] = [
   {
     id: '1',
     title: 'E-commerce Platform Redesign',
-    description: 'Complete overhaul of the existing e-commerce platform with modern UI/UX and improved performance.',
+    description:
+      'Complete overhaul of the existing e-commerce platform with modern UI/UX and improved performance.',
     clientId: '1',
     clientName: 'Tech Solutions Inc.',
     status: 'active',
@@ -92,12 +94,13 @@ export class ProjectService {
   // Initialize with default projects if none exist
   static async initializeProjects(): Promise<void> {
     try {
-      const existingProjects = await StorageService.getItem<Project[]>(PROJECTS_KEY);
+      const existingProjects =
+        await StorageService.getItem<Project[]>(PROJECTS_KEY);
       if (!existingProjects || existingProjects.length === 0) {
         await StorageService.setItem(PROJECTS_KEY, defaultProjects);
       }
     } catch (error) {
-      console.error('Error initializing projects:', error);
+      Logger.error('Error initializing projects:', error);
       throw error;
     }
   }
@@ -108,7 +111,7 @@ export class ProjectService {
       const projects = await StorageService.getItem<Project[]>(PROJECTS_KEY);
       return projects || [];
     } catch (error) {
-      console.error('Error getting projects:', error);
+      Logger.error('Error getting projects:', error);
       return [];
     }
   }
@@ -119,7 +122,7 @@ export class ProjectService {
       const projects = await this.getAllProjects();
       return projects.find(project => project.id === id) || null;
     } catch (error) {
-      console.error('Error getting project by ID:', error);
+      Logger.error('Error getting project by ID:', error);
       return null;
     }
   }
@@ -130,16 +133,18 @@ export class ProjectService {
       const projects = await this.getAllProjects();
       return projects.filter(project => project.clientId === clientId);
     } catch (error) {
-      console.error('Error getting projects by client ID:', error);
+      Logger.error('Error getting projects by client ID:', error);
       return [];
     }
   }
 
   // Add new project
-  static async addProject(projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Promise<Project> {
+  static async addProject(
+    projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<Project> {
     try {
       const projects = await this.getAllProjects();
-      
+
       // Get client name if not provided
       let clientName = projectData.clientName;
       if (!clientName) {
@@ -154,26 +159,29 @@ export class ProjectService {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      
+
       const updatedProjects = [newProject, ...projects];
       await StorageService.setItem(PROJECTS_KEY, updatedProjects);
-      
+
       // Update client project count
       await this.updateClientProjectCounts(projectData.clientId);
-      
+
       return newProject;
     } catch (error) {
-      console.error('Error adding project:', error);
+      Logger.error('Error adding project:', error);
       throw error;
     }
   }
 
   // Update existing project
-  static async updateProject(id: string, projectData: Partial<Omit<Project, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Project | null> {
+  static async updateProject(
+    id: string,
+    projectData: Partial<Omit<Project, 'id' | 'createdAt' | 'updatedAt'>>
+  ): Promise<Project | null> {
     try {
       const projects = await this.getAllProjects();
       const projectIndex = projects.findIndex(project => project.id === id);
-      
+
       if (projectIndex === -1) {
         throw new Error('Project not found');
       }
@@ -187,16 +195,19 @@ export class ProjectService {
 
       projects[projectIndex] = updatedProject;
       await StorageService.setItem(PROJECTS_KEY, projects);
-      
+
       // Update client project counts if client changed
-      if (projectData.clientId && projectData.clientId !== oldProject.clientId) {
+      if (
+        projectData.clientId &&
+        projectData.clientId !== oldProject.clientId
+      ) {
         await this.updateClientProjectCounts(oldProject.clientId);
         await this.updateClientProjectCounts(projectData.clientId);
       }
-      
+
       return updatedProject;
     } catch (error) {
-      console.error('Error updating project:', error);
+      Logger.error('Error updating project:', error);
       throw error;
     }
   }
@@ -207,42 +218,49 @@ export class ProjectService {
       const projects = await this.getAllProjects();
       const projectToDelete = projects.find(p => p.id === id);
       const filteredProjects = projects.filter(project => project.id !== id);
-      
+
       if (filteredProjects.length === projects.length) {
         return false; // Project not found
       }
 
       await StorageService.setItem(PROJECTS_KEY, filteredProjects);
-      
+
       // Update client project count
       if (projectToDelete) {
         await this.updateClientProjectCounts(projectToDelete.clientId);
       }
-      
+
       return true;
     } catch (error) {
-      console.error('Error deleting project:', error);
+      Logger.error('Error deleting project:', error);
       throw error;
     }
   }
 
   // Update client project counts
-  private static async updateClientProjectCounts(clientId: string): Promise<void> {
+  private static async updateClientProjectCounts(
+    clientId: string
+  ): Promise<void> {
     try {
       const clientProjects = await this.getProjectsByClientId(clientId);
-      await ClientService.updateClientProjectCount(clientId, clientProjects.length);
+      await ClientService.updateClientProjectCount(
+        clientId,
+        clientProjects.length
+      );
     } catch (error) {
-      console.error('Error updating client project counts:', error);
+      Logger.error('Error updating client project counts:', error);
     }
   }
 
   // Get projects by status
-  static async getProjectsByStatus(status: Project['status']): Promise<Project[]> {
+  static async getProjectsByStatus(
+    status: Project['status']
+  ): Promise<Project[]> {
     try {
       const projects = await this.getAllProjects();
       return projects.filter(project => project.status === status);
     } catch (error) {
-      console.error('Error getting projects by status:', error);
+      Logger.error('Error getting projects by status:', error);
       return [];
     }
   }
@@ -254,13 +272,16 @@ export class ProjectService {
       if (!query.trim()) return projects;
 
       const lowercaseQuery = query.toLowerCase();
-      return projects.filter(project => 
-        project.title.toLowerCase().includes(lowercaseQuery) ||
-        (project.description && project.description.toLowerCase().includes(lowercaseQuery)) ||
-        (project.clientName && project.clientName.toLowerCase().includes(lowercaseQuery))
+      return projects.filter(
+        project =>
+          project.title.toLowerCase().includes(lowercaseQuery) ||
+          (project.description &&
+            project.description.toLowerCase().includes(lowercaseQuery)) ||
+          (project.clientName &&
+            project.clientName.toLowerCase().includes(lowercaseQuery))
       );
     } catch (error) {
-      console.error('Error searching projects:', error);
+      Logger.error('Error searching projects:', error);
       return [];
     }
   }
@@ -277,7 +298,7 @@ export class ProjectService {
   }> {
     try {
       const projects = await this.getAllProjects();
-      
+
       return {
         total: projects.length,
         active: projects.filter(p => p.status === 'active').length,
@@ -288,7 +309,7 @@ export class ProjectService {
         totalSpent: projects.reduce((sum, p) => sum + (p.totalSpent || 0), 0),
       };
     } catch (error) {
-      console.error('Error getting project stats:', error);
+      Logger.error('Error getting project stats:', error);
       return {
         total: 0,
         active: 0,
@@ -300,4 +321,4 @@ export class ProjectService {
       };
     }
   }
-} 
+}

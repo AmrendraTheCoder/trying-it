@@ -1,3 +1,4 @@
+import { Logger } from '../utils/logger';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
@@ -27,7 +28,7 @@ class FileService {
 
       this.initialized = true;
     } catch (error) {
-      console.error('Failed to initialize file service:', error);
+      Logger.error('Failed to initialize file service:', error);
       this.attachments = [];
       this.initialized = true;
     }
@@ -43,7 +44,7 @@ class FileService {
         await this.saveAttachments();
       }
     } catch (error) {
-      console.error('Failed to load attachments:', error);
+      Logger.error('Failed to load attachments:', error);
       this.attachments = [];
     }
   }
@@ -52,7 +53,7 @@ class FileService {
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(this.attachments));
     } catch (error) {
-      console.error('Failed to save attachments:', error);
+      Logger.error('Failed to save attachments:', error);
     }
   }
 
@@ -100,7 +101,7 @@ class FileService {
 
       return attachment;
     } catch (error) {
-      console.error('Failed to upload file:', error);
+      Logger.error('Failed to upload file:', error);
       throw new Error('Failed to upload file');
     }
   }
@@ -151,7 +152,7 @@ class FileService {
 
       return true;
     } catch (error) {
-      console.error('Failed to delete attachment:', error);
+      Logger.error('Failed to delete attachment:', error);
       return false;
     }
   }
@@ -250,7 +251,7 @@ class FileService {
 
       return cleanedCount;
     } catch (error) {
-      console.error('Failed to cleanup orphaned files:', error);
+      Logger.error('Failed to cleanup orphaned files:', error);
       return 0;
     }
   }

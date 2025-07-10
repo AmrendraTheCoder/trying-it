@@ -1,3 +1,4 @@
+import { Logger } from '../utils/logger';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
@@ -95,7 +96,7 @@ class NotificationService {
 
       this.initialized = true;
     } catch (error) {
-      console.error('Failed to initialize notification service:', error);
+      Logger.error('Failed to initialize notification service:', error);
       throw error;
     }
   }
@@ -103,7 +104,7 @@ class NotificationService {
   private async configureNotifications(): Promise<void> {
     // Set the notification handler
     Notifications.setNotificationHandler({
-      handleNotification: async notification => {
+      handleNotification: async _notification => {
         const settings = await this.getSettings();
 
         // Check quiet hours
@@ -115,6 +116,8 @@ class NotificationService {
             shouldShowAlert: false,
             shouldPlaySound: false,
             shouldSetBadge: true,
+            shouldShowBanner: false,
+            shouldShowList: true,
           };
         }
 
@@ -122,6 +125,8 @@ class NotificationService {
           shouldShowAlert: true,
           shouldPlaySound: settings.soundEnabled,
           shouldSetBadge: true,
+          shouldShowBanner: true,
+          shouldShowList: true,
         };
       },
     });
@@ -130,7 +135,7 @@ class NotificationService {
     if (Platform.OS === 'ios') {
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== 'granted') {
-        console.warn('Notification permissions not granted');
+        Logger.warn('Notification permissions not granted');
       }
     }
   }
@@ -142,7 +147,7 @@ class NotificationService {
         this.notifications = JSON.parse(stored);
       }
     } catch (error) {
-      console.error('Failed to load notifications:', error);
+      Logger.error('Failed to load notifications:', error);
       this.notifications = [];
     }
   }
@@ -154,7 +159,7 @@ class NotificationService {
         JSON.stringify(this.notifications)
       );
     } catch (error) {
-      console.error('Failed to save notifications:', error);
+      Logger.error('Failed to save notifications:', error);
     }
   }
 
@@ -168,7 +173,7 @@ class NotificationService {
         await this.saveSettings();
       }
     } catch (error) {
-      console.error('Failed to load notification settings:', error);
+      Logger.error('Failed to load notification settings:', error);
       this.settings = this.getDefaultSettings();
     }
   }
@@ -180,7 +185,7 @@ class NotificationService {
         JSON.stringify(this.settings)
       );
     } catch (error) {
-      console.error('Failed to save notification settings:', error);
+      Logger.error('Failed to save notification settings:', error);
     }
   }
 
@@ -189,7 +194,7 @@ class NotificationService {
       const stored = await AsyncStorage.getItem(NOTIFICATION_TOKEN_KEY);
       this.pushToken = stored;
     } catch (error) {
-      console.error('Failed to load push token:', error);
+      Logger.error('Failed to load push token:', error);
     }
   }
 
@@ -198,7 +203,7 @@ class NotificationService {
       this.pushToken = token;
       await AsyncStorage.setItem(NOTIFICATION_TOKEN_KEY, token);
     } catch (error) {
-      console.error('Failed to save push token:', error);
+      Logger.error('Failed to save push token:', error);
     }
   }
 
@@ -254,7 +259,7 @@ class NotificationService {
 
   async registerForPushNotifications(): Promise<string | null> {
     if (!Device.isDevice) {
-      console.warn('Push notifications only work on physical devices');
+      Logger.warn('Push notifications only work on physical devices');
       return null;
     }
 
@@ -269,7 +274,7 @@ class NotificationService {
       }
 
       if (finalStatus !== 'granted') {
-        console.warn('Failed to get push notification permissions');
+        Logger.warn('Failed to get push notification permissions');
         return null;
       }
 
@@ -279,7 +284,7 @@ class NotificationService {
       await this.savePushToken(token);
       return token;
     } catch (error) {
-      console.error('Failed to register for push notifications:', error);
+      Logger.error('Failed to register for push notifications:', error);
       return null;
     }
   }
@@ -509,9 +514,7 @@ class NotificationService {
         sound: settings.soundEnabled ? 'default' : undefined,
         priority: this.mapPriorityToExpo(notification.priority),
       },
-      trigger: {
-        date: scheduledDate,
-      },
+      trigger: scheduledDate as any,
     });
 
     // Handle recurring notifications
@@ -569,9 +572,7 @@ class NotificationService {
             body: recurringNotification.body,
             data: recurringNotification.data || {},
           },
-          trigger: {
-            date: nextDate,
-          },
+          trigger: nextDate as any,
         });
 
         this.notifications.unshift(recurringNotification);
